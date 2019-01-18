@@ -1,0 +1,4 @@
+github.com/bmaupin/go-epub v0.5.0 h1:ptOZQuO3YBRytuhRPsHUJh5bRmvP66/GvB+NWTC2dyE=
+github.com/bmaupin/go-epub v0.5.0/go.mod h1:4RBr0Zo03mRGOyGAcc25eLOqIPCkMbfz+tINVmH6clQ=
+github.com/gofrs/uuid v3.1.0+incompatible h1:q2rtkjaKT4YEr6E1kamy0Ha4RtepWlQBedyHx0uzKwA=
+github.com/gofrs/uuid v3.1.0+incompatible/go.mod h1:b2aQJv3Z4Fp6yNu3cdSllBxTCLRxnplIgP/c0N/04lM=
