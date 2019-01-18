@@ -15,8 +15,9 @@ Usage of TmdTextEpub.exe:
 ```
 
 ### 示例
+1. [点击下载](https://github.com/ystyle/TmdTextEpub/releases)
 1. 把小说和`TmdTextEpub.exe`放到`D`盘
-2. 按以下其中一种方法打开命令行
+1. 按以下其中一种方法打开命令行
     - 按`win + r` 输入 `cmd` 然后输入以下命令
     - 按`win + x + i` 输入以下命令
 
