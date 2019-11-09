@@ -41,7 +41,7 @@ cd d:/
 d:/TmdTextEpub.exe -filename d:/ebbok.txt -match "Section \d+"
 ```
 
-自定义章节匹配, 章节为`第x节` ~ `Section 100` 这种: 
+自定义章节匹配, 章节为`第x节` 这种: 
 ```shell
 cd d:/
 d:/TmdTextEpub.ex e-filename d:/ebbok.txt -match "第.{1,8}节"
