@@ -51,3 +51,6 @@ d:/TmdTextEpub.ex e-filename d:/ebbok.txt -match "第.{1,8}节"
 ```$xslt
 go build -ldflags "-s -w" -o TmdTextEpub.exe main.go
 ```
+快捷方法:
+- windows: 在`build.ps1`上右键选择`以 Power Shell 运行`
+- linux: 在本项目源码目录执行 `./build.sh`
