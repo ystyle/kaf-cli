@@ -29,9 +29,22 @@ Usage of E:\Code\Go\bin\TmdTextEpub.exe:
     - 按`win + r` 输入 `cmd` 然后输入以下命令
     - 按`win + x + i` 输入以下命令
 
+使用示例:
 ```shell
 cd d:/
-d:/TmdTextEpub.exe -author 乱 -filename d:/全职法师.txt -match 第.{1,4}章
+d:/TmdTextEpub.exe -author 乱 -filename d:/全职法师.txt
+```
+
+自定义章节匹配, 章节为`Section 1` ~ `Section 100` 这种: 
+```shell
+cd d:/
+d:/TmdTextEpub.exe -filename d:/ebbok.txt -match "Section \d+"
+```
+
+自定义章节匹配, 章节为`第x节` ~ `Section 100` 这种: 
+```shell
+cd d:/
+d:/TmdTextEpub.ex e-filename d:/ebbok.txt -match "第.{1,8}节"
 ```
 
 ### 手工构建
