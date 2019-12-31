@@ -53,6 +53,15 @@ cd d:/
 d:/TmdTextEpub.ex e-filename d:/ebbok.txt -match "Chapter .{1,8}"
 ```
 
+### 把书转为kindle的mobi格式
+1. 在官网下载[kindlegen](https://www.amazon.com/gp/feature.html?ie=UTF8&docId=1000765211)
+2. 同样放到`d:`盘根目录下， 执行以下命令转换
+  ```shell
+  cd d:/
+  d:/kindlegen.exe d:/全职法师.mobi
+  ```
+3. 在d盘就能找到mobi文件了，复制到kindle的documents目录下，打开kindle就能看到小说了
+
 ### 手工构建
 ```$xslt
 go build -ldflags "-s -w" -o TmdTextEpub.exe main.go
