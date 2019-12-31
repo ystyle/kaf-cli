@@ -3,15 +3,15 @@
 > 把txt文本转成epub电子书的命令行工具
 
 ### 功能
-- 自动识别书名和章节
+- 自动识别书名和章节(以下示例的章节名都可以自动匹配)
 - 自定义章节匹配
 - 自动给章节正文生成加粗居中的标题
 - 段落自动识别
 - 段落自动缩进
 
 ### 使用方法
-```$xslt
-Usage of E:\Code\Go\bin\TmdTextEpub.exe:
+```shell
+Usage of D:\TmdTextEpub.exe:
   -author string
         作者 (default "YSTYLE")
   -bookname string
@@ -19,7 +19,9 @@ Usage of E:\Code\Go\bin\TmdTextEpub.exe:
   -filename string
         txt 文件名
   -match string
-        匹配标题的正则表达式, 例: -match 第.{1,8}章 表示第和章字之间可以有1-8个任意文字 (default "第.{1,8}章")
+        匹配标题的正则表达式, 不写可以自动识别, 如果没生成章节就参考教程。例: -match 第.{1,8}章 表示第和章字之间可以有1-8个任意文字 (default "自动匹配,可自定义")
+  -tips
+        添加本软件教程 (default true)
 ```
 
 ### 示例
@@ -50,7 +52,7 @@ d:/TmdTextEpub.exe -filename d:/ebbok.txt -match "Section \d+"
 自定义章节匹配, 章节格式为`Chapter xxx`: 
 ```shell
 cd d:/
-d:/TmdTextEpub.ex e-filename d:/ebbok.txt -match "Chapter .{1,8}"
+d:/TmdTextEpub.exe -filename d:/ebbok.txt -match "Chapter .{1,8}"
 ```
 
 ### 把书转为kindle的mobi格式
