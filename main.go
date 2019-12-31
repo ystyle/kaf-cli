@@ -19,13 +19,15 @@ var (
 	bookname string // 书名
 	match    string // 正则
 	author   string // 正则
+	Tips     bool
 )
 
 const (
-	htmlPStart     = `<p  style="text-indent: 2em">`
-	htmlPEnd       = "</p>"
-	htmlTitleStart = `<h3 style="text-align:center">`
-	htmlTitleEnd   = "</h3>"
+	htmlPStart       = `<p  style="text-indent: 2em">`
+	htmlPEnd         = "</p>"
+	htmlTitleStart   = `<h3 style="text-align:center">`
+	htmlTitleEnd     = "</h3>"
+	DefaultMatchTips = "自动匹配,可自定义"
 )
 
 // 解析程序参数
@@ -33,7 +35,8 @@ func init() {
 	flag.StringVar(&filename, "filename", "", "txt 文件名")
 	flag.StringVar(&author, "author", "YSTYLE", "作者")
 	flag.StringVar(&bookname, "bookname", "", "书名: 默认为txt文件名")
-	flag.StringVar(&match, "match", "第.{1,8}章", "匹配标题的正则表达式, 例: -match 第.{1,8}章 表示第和章字之间可以有1-8个任意文字")
+	flag.StringVar(&match, "match", DefaultMatchTips, "匹配标题的正则表达式, 不写可以自动识别, 如果没生成章节就参考教程。例: -match 第.{1,8}章 表示第和章字之间可以有1-8个任意文字")
+	flag.BoolVar(&Tips, "tips", true, "添加本软件教程")
 	flag.Parse()
 }
 
@@ -75,6 +78,9 @@ func main() {
 	fmt.Println("正在读取txt文件...")
 
 	// 编译正则表达式
+	if match == "" || match == DefaultMatchTips {
+		match = "第.{1,10}(章|节)|(S|s)ection.{1,10}|(C|c)hapter.{1,10}"
+	}
 	reg, err := regexp.Compile(match)
 	if err != nil {
 		fmt.Printf("生成匹配规则出错: %s\n%s\n", match, err.Error())
@@ -99,6 +105,12 @@ func main() {
 		if reg.MatchString(line) {
 			if title == "" {
 				title = "说明"
+				if Tips {
+					content.WriteString(htmlPStart)
+					content.WriteString("本书由TmdTextEpub生成: <br/>")
+					content.WriteString("制作教程: <a href='https://ystyle.top/2019/12/31/txt-converto-epub-and-mobi/'>https://ystyle.top/2019/12/31/txt-converto-epub-and-mobi/</a>")
+					content.WriteString(htmlPEnd)
+				}
 			}
 			e.AddSection(content.String(), title, "", "")
 			title = line
