@@ -61,7 +61,7 @@ d:/TmdTextEpub.exe -filename d:/ebbok.txt -match "Chapter .{1,8}"
 2. 同样放到`d:`盘根目录下， 执行以下命令转换
   ```shell
   cd d:/
-  d:/kindlegen.exe d:/全职法师.mobi
+  d:/kindlegen.exe d:/全职法师.epub
   ```
 3. 在d盘就能找到mobi文件了，复制到kindle的documents目录下，打开kindle就能看到小说了
 
