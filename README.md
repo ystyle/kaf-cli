@@ -25,6 +25,9 @@ Usage of D:\TmdTextEpub.exe:
         添加本软件教程 (default true)
 ```
 
+### 效果
+![](https://dl.ystyle.top/images/2020-01/2020-01-21_12-02.png)
+
 ### 示例
 1. [点击下载](https://github.com/ystyle/TmdTextEpub/releases/latest)
 1. 把小说和`TmdTextEpub.exe`放到`D`盘
