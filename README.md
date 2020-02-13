@@ -4,11 +4,13 @@
 
 ### 功能
 - 自动识别书名和章节(示例中所有用法都会自动识别)
+- 自动识别字符编码(自动解决中文乱码)
 - 自定义章节匹配
 - 自动给章节正文生成加粗居中的标题
 - 段落自动识别
 - 段落自动缩进
 - 超快速(130章/s以上速度, 4000章30s不到)
+- 自动转为mobi格式`(linux/osx自行安装kindlegen并添加到PATH)`
 
 ### 使用方法
 ```shell
@@ -60,13 +62,16 @@ d:/TmdTextEpub.exe -filename d:/ebbok.txt -match "Chapter .{1,8}"
 ```
 
 ### 把书转为kindle的mobi格式
-1. 在官网下载[kindlegen](https://www.amazon.com/gp/feature.html?ie=UTF8&docId=1000765211)
-2. 同样放到`d:`盘根目录下， 执行以下命令转换
-  ```shell
-  cd d:/
-  d:/kindlegen.exe d:/全职法师.epub
-  ```
-3. 在d盘就能找到mobi文件了，复制到kindle的documents目录下，打开kindle就能看到小说了
+1. 默认会检测是否存在 `kindlegen` 存在时会自动生成mobi文件
+2. 如果没生成：
+    1. 在官网下载[kindlegen](https://www.amazon.com/gp/feature.html?ie=UTF8&docId=1000765211)
+    2. 同样放到`d:`盘根目录下(放到TmdTextEpub.exe同目录，或添加到PATH)，重新执行上面的命令会同时生成epub和mobi文件
+    3. 手工把epub转为mobi
+      ```shell
+      cd d:/
+      d:/kindlegen.exe d:/全职法师.epub
+      ```
+3. 找到mobi文件，复制到kindle的documents目录下，打开kindle就能看到小说了
 
 ### 手工构建
 ```$xslt
