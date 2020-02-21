@@ -65,6 +65,8 @@ d:/TmdTextEpub.exe -filename d:/ebbok.txt -match "Section \d+"
 cd d:/
 d:/TmdTextEpub.exe -filename d:/ebbok.txt -match "Chapter .{1,8}"
 ```
+### 效果
+![效果图片](2020-01-21_12-02.png)
 
 ### 在任意位置执行命令
 
