@@ -67,8 +67,9 @@ d:/TmdTextEpub.exe -filename d:/ebbok.txt -match "Chapter .{1,8}"
 ```
 
 ### 在任意位置执行命令
-1. 把`TmdTextEpub.exe` 和 `kindlegen.exe` 放`c:/windows/`下边
-2. 以后可以把小说放任意目录，都可以很简单执行转换， 第一步只需要做一次， 以下为每次转换小说的操作，
+
+- 把`TmdTextEpub.exe` 和 `kindlegen.exe` 放`c:/windows/`下边
+- 以后可以把小说放任意目录，都可以很简单执行转换， 第一步只需要做一次， 以下为每次转换小说的操作，
   - 打开小说在的文件夹, 按住`Shift键`不放，鼠标右击文件夹空白位置
   - 在右键菜单选择 `用命令行打开` 或 `以PowerShell打开`
   - 以上命令可以改为 `TmdTextEpub.exe -filename 全职法师.txt`,  现在可以不用写盘符了
