@@ -38,13 +38,22 @@ const (
 
 // 解析程序参数
 func init() {
-	flag.StringVar(&filename, "filename", "", "txt 文件名")
-	flag.StringVar(&author, "author", "YSTYLE", "作者")
-	flag.StringVar(&bookname, "bookname", "", "书名: 默认为txt文件名")
-	flag.UintVar(&max, "max", 35, "标题最大字数")
-	flag.StringVar(&match, "match", DefaultMatchTips, "匹配标题的正则表达式, 不写可以自动识别, 如果没生成章节就参考教程。例: -match 第.{1,8}章 表示第和章字之间可以有1-8个任意文字")
-	flag.BoolVar(&Tips, "tips", true, "添加本软件教程")
-	flag.Parse()
+	if len(os.Args) == 2 && strings.HasSuffix(os.Args[1], ".txt") {
+		fmt.Println("傻瓜模式开启...")
+		filename = os.Args[1]
+		author = "YSTYLE"
+		max = 35
+		match = DefaultMatchTips
+		Tips = true
+	} else {
+		flag.StringVar(&filename, "filename", "", "txt 文件名")
+		flag.StringVar(&author, "author", "YSTYLE", "作者")
+		flag.StringVar(&bookname, "bookname", "", "书名: 默认为txt文件名")
+		flag.UintVar(&max, "max", 35, "标题最大字数")
+		flag.StringVar(&match, "match", DefaultMatchTips, "匹配标题的正则表达式, 不写可以自动识别, 如果没生成章节就参考教程。例: -match 第.{1,8}章 表示第和章字之间可以有1-8个任意文字")
+		flag.BoolVar(&Tips, "tips", true, "添加本软件教程")
+		flag.Parse()
+	}
 	decoder = simplifiedchinese.GBK.NewDecoder()
 }
 
