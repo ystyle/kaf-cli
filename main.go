@@ -16,6 +16,7 @@ import (
 	"runtime"
 	"strings"
 	"time"
+	"unicode/utf8"
 )
 
 var (
@@ -166,7 +167,7 @@ func main() {
 			continue
 		}
 		// 处理标题
-		if len(line) <= int(max) && reg.MatchString(line) {
+		if utf8.RuneCountInString(line) <= int(max) && reg.MatchString(line) {
 			if title == "" {
 				title = "说明"
 				if Tips {
