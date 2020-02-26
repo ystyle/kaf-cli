@@ -15,15 +15,14 @@
 
 ### 使用方法
 1. [点击下载](https://github.com/ystyle/TmdTextEpub/releases/latest)
-1. 把小说、 `TmdTextEpub.exe` 和 `kindlegen.exe` 放到`D`盘
-1. 按以下其中一种方法打开命令行
-    - 按`win + r` 输入 `cmd` 然后输入以下命令
-    - 按`win + x + i` 输入以下命令
-转换`全职法师.txt`， 输入以下命令
-```shell
-cd d:/
-d:/TmdTextEpub.exe -filename d:/全职法师.txt
-```
+   - [百度网盘 `https://pan.baidu.com/s/1EPkLJ7WIJYdYtRHBEMqw0w`](https://pan.baidu.com/s/1EPkLJ7WIJYdYtRHBEMqw0w) 提取码：`h4np`
+1. 解压, 把小说直接拖到 `TmdTextEpub.exe` 文件上面
+1. 等转换完，目录下会生成epub和mobi文件
+
+### 效果
+![效果图片](2020-01-21_12-02.png)
+
+### 命令行模式
 
 全部参数为：
 ```$xslt
@@ -40,14 +39,17 @@ Usage of D:\TmdTextEpub.exe:
         添加本软件教程 (default true)
 ```
 
-### 更多示例
->该全部示例都可以自动识别，用上面的例子就行了
-
 把`全职法师.txt`生成epub, 并设置作者名为`乱`
 ```shell
 cd d:/
 d:/TmdTextEpub.exe -author 乱 -filename d:/全职法师.txt
 ```
+
+
+>以下全部示例都可以自动识别，不需要自己设定标题格式了， 一般用上用上面的例子就行了
+
+>要自定义标题格式参考以下几个例子
+
 
 自定义章节匹配, 章节格式为`第x节`: 
 ```shell
@@ -66,8 +68,7 @@ d:/TmdTextEpub.exe -filename d:/ebbok.txt -match "Section \d+"
 cd d:/
 d:/TmdTextEpub.exe -filename d:/ebbok.txt -match "Chapter .{1,8}"
 ```
-### 效果
-![效果图片](2020-01-21_12-02.png)
+
 
 ### 在任意位置执行命令
 
