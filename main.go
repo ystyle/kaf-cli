@@ -35,6 +35,9 @@ const (
 	htmlTitleStart   = `<h3 style="text-align:center">`
 	htmlTitleEnd     = "</h3>"
 	DefaultMatchTips = "自动匹配,可自定义"
+	Tutorial         = `本书由TmdTextEpub生成: <br/>
+制作教程: <a href='https://ystyle.top/2019/12/31/txt-converto-epub-and-mobi/'>https://ystyle.top/2019/12/31/txt-converto-epub-and-mobi</a>
+`
 )
 
 // 解析程序参数
@@ -128,7 +131,7 @@ func main() {
 
 	// 编译正则表达式
 	if match == "" || match == DefaultMatchTips {
-		match = "^.{0,8}(第.{1,20}(章|节)|(S|s)ection.{1,20}|(C|c)hapter.{1,20})"
+		match = "^.{0,8}(第.{1,20}(章|节)|(S|s)ection.{1,20}|(C|c)hapter.{1,20}|引子|楔子)"
 	}
 	reg, err := regexp.Compile(match)
 	if err != nil {
@@ -172,8 +175,7 @@ func main() {
 				title = "说明"
 				if Tips {
 					content.WriteString(htmlPStart)
-					content.WriteString("本书由TmdTextEpub生成: <br/>")
-					content.WriteString("制作教程: <a href='https://ystyle.top/2019/12/31/txt-converto-epub-and-mobi/'>https://ystyle.top/2019/12/31/txt-converto-epub-and-mobi</a>")
+					content.WriteString(Tutorial)
 					content.WriteString(htmlPEnd)
 				}
 			}
@@ -198,6 +200,11 @@ func main() {
 	}
 	end := time.Now().Sub(start)
 	fmt.Println("读取文件耗时:", end)
+
+	// 添加提示
+	if Tips {
+		e.AddSection(Tutorial, "制作说明", "", "")
+	}
 
 	// Write the EPUB
 	fmt.Println("正在生成电子书...")
