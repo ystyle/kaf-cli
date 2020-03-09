@@ -6,9 +6,11 @@ import (
 	"flag"
 	"fmt"
 	"github.com/bmaupin/go-epub"
+	"golang.org/x/net/html/charset"
 	"golang.org/x/text/encoding"
-	"golang.org/x/text/encoding/simplifiedchinese"
+	"golang.org/x/text/transform"
 	"io"
+	"io/ioutil"
 	"os"
 	"os/exec"
 	"path/filepath"
@@ -25,8 +27,8 @@ var (
 	match    string // 正则
 	author   string // 作者
 	max      uint   // 标题最大字数
-	decoder  *encoding.Decoder
 	Tips     bool
+	decoder  *encoding.Decoder
 )
 
 const (
@@ -58,7 +60,6 @@ func init() {
 		flag.BoolVar(&Tips, "tips", true, "添加本软件教程")
 		flag.Parse()
 	}
-	decoder = simplifiedchinese.GBK.NewDecoder()
 }
 
 func readBuffer(filename string) *bufio.Reader {
@@ -67,47 +68,25 @@ func readBuffer(filename string) *bufio.Reader {
 		fmt.Println("读取文件出错: ", err.Error())
 		os.Exit(1)
 	}
-	buf := bufio.NewReader(f)
-	return buf
-}
-
-func preNUm(data byte) int {
-	str := fmt.Sprintf("%b", data)
-	var i int = 0
-	for i < len(str) {
-		if str[i] != '1' {
-			break
+	temBuf := bufio.NewReader(f)
+	bs, _ := temBuf.Peek(1024)
+	encodig, encodename, _ := charset.DetermineEncoding(bs, "text/plain")
+	if encodename != "utf-8" {
+		f.Seek(0, 0)
+		bs, err := ioutil.ReadAll(f)
+		if err != nil {
+			fmt.Println("读取文件出错: ", err.Error())
+			os.Exit(1)
 		}
-		i++
+		var buf bytes.Buffer
+		bs, _, _ = transform.Bytes(encodig.NewDecoder(), bs)
+		buf.Write(bs)
+		return bufio.NewReader(&buf)
+	} else {
+		f.Seek(0, 0)
+		buf := bufio.NewReader(f)
+		return buf
 	}
-	return i
-}
-func isUtf8(data []byte) bool {
-	for i := 0; i < len(data); {
-		if data[i]&0x80 == 0x00 {
-			i++
-			continue
-		} else if num := preNUm(data[i]); num > 2 {
-			i++
-			for j := 0; j < num-1; j++ {
-				if data[i]&0xc0 != 0x80 {
-					return false
-				}
-				i++
-			}
-		} else {
-			return false
-		}
-	}
-	return true
-}
-
-func conver(str string) string {
-	buff, err := decoder.Bytes([]byte(str))
-	if err != nil {
-		return str
-	}
-	return string(buff)
 }
 
 func main() {
@@ -131,7 +110,7 @@ func main() {
 
 	// 编译正则表达式
 	if match == "" || match == DefaultMatchTips {
-		match = "^.{0,8}(第.{1,20}(章|节)|(S|s)ection.{1,20}|(C|c)hapter.{1,20}|引子|楔子)"
+		match = "^.{0,8}(第.{1,20}(章|节)|(S|s)ection.{1,20}|(C|c)hapter.{1,20}|(P|p)age.{1,20}|引子|楔子)"
 	}
 	reg, err := regexp.Compile(match)
 	if err != nil {
@@ -161,9 +140,7 @@ func main() {
 			fmt.Println("读取文件出错:", err.Error())
 			os.Exit(1)
 		}
-		if !isUtf8([]byte(line)) {
-			line = conver(line)
-		}
+
 		line = strings.TrimSpace(line)
 		// 空行直接跳过
 		if len(line) == 0 {
