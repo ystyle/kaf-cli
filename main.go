@@ -8,6 +8,7 @@ import (
 	"github.com/bmaupin/go-epub"
 	"golang.org/x/net/html/charset"
 	"golang.org/x/text/encoding"
+	"golang.org/x/text/encoding/simplifiedchinese"
 	"golang.org/x/text/transform"
 	"io"
 	"io/ioutil"
@@ -79,7 +80,11 @@ func readBuffer(filename string) *bufio.Reader {
 			os.Exit(1)
 		}
 		var buf bytes.Buffer
-		bs, _, _ = transform.Bytes(encodig.NewDecoder(), bs)
+		decoder = encodig.NewDecoder()
+		if encodename == "windows-1252" {
+			decoder = simplifiedchinese.GBK.NewDecoder()
+		}
+		bs, _, _ = transform.Bytes(decoder, bs)
 		buf.Write(bs)
 		return bufio.NewReader(&buf)
 	} else {
@@ -135,6 +140,7 @@ func main() {
 		if err != nil {
 			if err == io.EOF {
 				e.AddSection(content.String(), title, "", "")
+				content.Reset()
 				break
 			}
 			fmt.Println("读取文件出错:", err.Error())
@@ -174,6 +180,13 @@ func main() {
 		content.WriteString(htmlPStart)
 		content.WriteString(line)
 		content.WriteString(htmlPEnd)
+	}
+	// 没识别到章节又没识别到 EOF 时，把所有的内容写到最后一章
+	if content.Len() != 0 {
+		if title == "" {
+			title = "章节正文"
+		}
+		e.AddSection(content.String(), title, "", "")
 	}
 	end := time.Now().Sub(start)
 	fmt.Println("读取文件耗时:", end)
