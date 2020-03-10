@@ -82,7 +82,7 @@ func readBuffer(filename string) *bufio.Reader {
 		var buf bytes.Buffer
 		decoder = encodig.NewDecoder()
 		if encodename == "windows-1252" {
-			decoder = simplifiedchinese.GBK.NewDecoder()
+			decoder = simplifiedchinese.GB18030.NewDecoder()
 		}
 		bs, _, _ = transform.Bytes(decoder, bs)
 		buf.Write(bs)
