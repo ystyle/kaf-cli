@@ -139,6 +139,11 @@ func main() {
 		line, err := buf.ReadString('\n')
 		if err != nil {
 			if err == io.EOF {
+				if line != "" {
+					if line = strings.TrimSpace(line); line != "" {
+						AddPart(&content, line)
+					}
+				}
 				e.AddSection(content.String(), title, "", "")
 				content.Reset()
 				break
@@ -146,7 +151,6 @@ func main() {
 			fmt.Println("读取文件出错:", err.Error())
 			os.Exit(1)
 		}
-
 		line = strings.TrimSpace(line)
 		// 空行直接跳过
 		if len(line) == 0 {
@@ -157,10 +161,11 @@ func main() {
 			if title == "" {
 				title = "说明"
 				if Tips {
-					content.WriteString(htmlPStart)
-					content.WriteString(Tutorial)
-					content.WriteString(htmlPEnd)
+					AddPart(&content, Tutorial)
 				}
+			}
+			if content.Len() == 0 {
+				continue
 			}
 			e.AddSection(content.String(), title, "", "")
 			title = line
@@ -177,9 +182,7 @@ func main() {
 			content.WriteString(line)
 			continue
 		}
-		content.WriteString(htmlPStart)
-		content.WriteString(line)
-		content.WriteString(htmlPEnd)
+		AddPart(&content, line)
 	}
 	// 没识别到章节又没识别到 EOF 时，把所有的内容写到最后一章
 	if content.Len() != 0 {
@@ -210,6 +213,12 @@ func main() {
 	ConverToMobi(epubName)
 	end = time.Now().Sub(start)
 	fmt.Println("\n转换完成! 总耗时:", end)
+}
+
+func AddPart(buff *bytes.Buffer, content string) {
+	buff.WriteString(htmlPStart)
+	buff.WriteString(content)
+	buff.WriteString(htmlPEnd)
 }
 
 func Run(command string, args ...string) error {
