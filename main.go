@@ -14,6 +14,7 @@ import (
 	"io/ioutil"
 	"os"
 	"os/exec"
+	"path"
 	"path/filepath"
 	"regexp"
 	"runtime"
@@ -33,12 +34,16 @@ var (
 )
 
 const (
-	htmlPStart       = `<p  style="text-indent: 2em">`
+	htmlPStart       = `<p class="content">`
 	htmlPEnd         = "</p>"
-	htmlTitleStart   = `<h3 style="text-align:center">`
+	htmlTitleStart   = `<h3 class="title">`
 	htmlTitleEnd     = "</h3>"
 	DefaultMatchTips = "自动匹配,可自定义"
-	Tutorial         = `本书由TmdTextEpub生成: <br/>
+	cssContent       = `
+.title {text-align:center}
+.content {text-indent: 2em}
+`
+	Tutorial = `本书由TmdTextEpub生成: <br/>
 制作教程: <a href='https://ystyle.top/2019/12/31/txt-converto-epub-and-mobi/'>https://ystyle.top/2019/12/31/txt-converto-epub-and-mobi</a>
 `
 )
@@ -123,12 +128,30 @@ func main() {
 		return
 	}
 
+	// 写入样式
+	tempDir, err := ioutil.TempDir("", "TmdTextEpub")
+	defer func() {
+		if err := os.RemoveAll(tempDir); err != nil {
+			panic(fmt.Sprintf("创建临时文件夹失败: %s", err))
+		}
+	}()
+	pageStylesFile := path.Join(tempDir, "page_styles.css")
+	err = ioutil.WriteFile(pageStylesFile, []byte(cssContent), 0666)
+	if err != nil {
+		panic(fmt.Sprintf("无法写入样式文件: %s", err))
+	}
+
 	start := time.Now()
 	// Create a ne EPUB
 	e := epub.NewEpub(bookname)
 
 	// Set the author
 	e.SetAuthor(author)
+	css, err := e.AddCSS(pageStylesFile, "")
+	if err != nil {
+		panic(fmt.Sprintf("无法写入样式文件: %s", err))
+	}
+
 	fmt.Println("正在读取txt文件...")
 
 	buf := readBuffer(filename)
@@ -144,7 +167,7 @@ func main() {
 						AddPart(&content, line)
 					}
 				}
-				e.AddSection(content.String(), title, "", "")
+				e.AddSection(content.String(), title, "", css)
 				content.Reset()
 				break
 			}
@@ -167,7 +190,7 @@ func main() {
 			if content.Len() == 0 {
 				continue
 			}
-			e.AddSection(content.String(), title, "", "")
+			e.AddSection(content.String(), title, "", css)
 			title = line
 			content.Reset()
 			content.WriteString(htmlTitleStart)
@@ -230,7 +253,6 @@ func AddPart(buff *bytes.Buffer, content string) {
 
 func Run(command string, args ...string) error {
 	cmd := exec.Command(command, args...)
-	cmd.Stdout = os.Stdout
 	cmd.Stderr = os.Stderr
 	return cmd.Run()
 }
@@ -245,9 +267,9 @@ func ConverToMobi(bookname string) {
 		return
 	}
 	fmt.Printf("\n检测到Kindle格式转换器: %s，正在把书籍转换成Kindle格式...\n", command)
-	fmt.Println("转换mobi比较花时间, 请等待...")
+	fmt.Println("转换mobi比较花时间, 大约耗时1-10分钟, 请等待...")
 	start := time.Now()
-	Run(kindlegen, "-dont_append_source", bookname)
+	Run(kindlegen, "-dont_append_source", "-c1", bookname)
 	// 计算耗时
 	end := time.Now().Sub(start)
 	fmt.Println("转换为Kindle格式耗时:", end)

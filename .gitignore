@@ -1,5 +1,7 @@
 .idea
 *.epub
+*.mobi
 *.txt
 *.exe
+*.tmp
 TmdTextEpub-*
