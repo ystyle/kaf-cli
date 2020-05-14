@@ -30,6 +30,7 @@ var (
 	author   string // 作者
 	max      uint   // 标题最大字数
 	Tips     bool
+	lang     string // 设置语言
 	decoder  *encoding.Decoder
 )
 
@@ -48,6 +49,14 @@ const (
 `
 )
 
+func parseLang(lang string) string {
+	var langs = "en,de,fr,it,es,zh,ja,pt,ru,nl"
+	if strings.Contains(langs, lang) {
+		return lang
+	}
+	return "en"
+}
+
 // 解析程序参数
 func init() {
 	if len(os.Args) == 2 && strings.HasSuffix(os.Args[1], ".txt") {
@@ -57,12 +66,14 @@ func init() {
 		max = 35
 		match = DefaultMatchTips
 		Tips = true
+		lang = "zh"
 	} else {
 		flag.StringVar(&filename, "filename", "", "txt 文件名")
 		flag.StringVar(&author, "author", "YSTYLE", "作者")
 		flag.StringVar(&bookname, "bookname", "", "书名: 默认为txt文件名")
 		flag.UintVar(&max, "max", 35, "标题最大字数")
 		flag.StringVar(&match, "match", DefaultMatchTips, "匹配标题的正则表达式, 不写可以自动识别, 如果没生成章节就参考教程。例: -match 第.{1,8}章 表示第和章字之间可以有1-8个任意文字")
+		flag.StringVar(&lang, "lang", "zh", "设置语言: en,de,fr,it,es,zh,ja,pt,ru,nl")
 		flag.BoolVar(&Tips, "tips", true, "添加本软件教程")
 		flag.Parse()
 	}
@@ -141,10 +152,12 @@ func main() {
 		panic(fmt.Sprintf("无法写入样式文件: %s", err))
 	}
 
+	lang = parseLang(lang)
+
 	start := time.Now()
 	// Create a ne EPUB
 	e := epub.NewEpub(bookname)
-
+	e.SetLang(lang)
 	// Set the author
 	e.SetAuthor(author)
 	css, err := e.AddCSS(pageStylesFile, "")
@@ -262,15 +275,30 @@ func ConverToMobi(bookname string) {
 	if runtime.GOOS == "windows" {
 		command = "kindlegen.exe"
 	}
-	kindlegen, err := exec.LookPath(command)
-	if err != nil {
-		return
+	kindlegen, _ := exec.LookPath(command)
+	if kindlegen == "" {
+		currentDir := path.Dir(os.Args[0])
+		kindlegen = path.Join(currentDir, command)
+		if exist, _ := IsExists(kindlegen); !exist {
+			return
+		}
 	}
 	fmt.Printf("\n检测到Kindle格式转换器: %s，正在把书籍转换成Kindle格式...\n", command)
 	fmt.Println("转换mobi比较花时间, 大约耗时1-10分钟, 请等待...")
 	start := time.Now()
-	Run(kindlegen, "-dont_append_source", "-c1", bookname)
+	Run(kindlegen, "-dont_append_source", "-locale", lang, "-c1", bookname)
 	// 计算耗时
 	end := time.Now().Sub(start)
 	fmt.Println("转换为Kindle格式耗时:", end)
+}
+
+func IsExists(path string) (bool, error) {
+	_, err := os.Stat(path)
+	if err == nil {
+		return true, nil
+	}
+	if os.IsNotExist(err) {
+		return false, nil
+	}
+	return false, err
 }
