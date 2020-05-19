@@ -131,7 +131,7 @@ func main() {
 
 	// 编译正则表达式
 	if match == "" || match == DefaultMatchTips {
-		match = "^.{0,8}(第.{1,20}(章|节)|(S|s)ection.{1,20}|(C|c)hapter.{1,20}|(P|p)age.{1,20}|引子|楔子)"
+		match = "^.{0,8}(第.{1,20}(章|节)|(S|s)ection.{1,20}|(C|c)hapter.{1,20}|(P|p)age.{1,20})|^\\d{1,4}.{0,20}$|^引子|^楔子|^章节目录"
 	}
 	reg, err := regexp.Compile(match)
 	if err != nil {
