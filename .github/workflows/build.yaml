@@ -1,6 +1,8 @@
 name: Go
 
-on: release
+on:
+  release:
+    types: [published]
 
 jobs:
 
