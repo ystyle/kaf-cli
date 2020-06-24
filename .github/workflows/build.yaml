@@ -24,8 +24,8 @@ jobs:
         run: |
           curl -OL http://kindlegen.s3.amazonaws.com/KindleGen_Mac_i386_v2_9.zip
           curl -OL http://kindlegen.s3.amazonaws.com/kindlegen_win32_v2_9.zip
-          unzip KindleGen_Mac_i386_v2_9.zip
-          unzip kindlegen_win32_v2_9.zip
+          unzip -d darwin KindleGen_Mac_i386_v2_9.zip
+          unzip -d windows kindlegen_win32_v2_9.zip
 
       - name: Build
         run: |
@@ -36,8 +36,8 @@ jobs:
 
       - name: compression zip
         run: |
-          zip TmdTextEpub-windows.zip kindlegen.exe TmdTextEpub.exe TmdTextEpub_32.exe
-          zip TmdTextEpub-darwin.zip kindlegen TmdTextEpub-darwin
+          zip -J TmdTextEpub-windows.zip windows/kindlegen.exe TmdTextEpub.exe TmdTextEpub_32.exe
+          zip -J TmdTextEpub-darwin.zip darwin/kindlegen TmdTextEpub-darwin
           zip TmdTextEpub-linux.zip TmdTextEpub-linux
 
       - name: Upload windows to release
