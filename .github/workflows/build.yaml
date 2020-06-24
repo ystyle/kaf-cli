@@ -50,11 +50,11 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Upload linux to release
-          uses: JasonEtco/upload-to-release@master
-          with:
-            args: TmdTextEpub-linux.zip application/octet-stream
-          env:
-            GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        uses: JasonEtco/upload-to-release@master
+        with:
+          args: TmdTextEpub-linux.zip application/octet-stream
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Upload mac to release
           uses: JasonEtco/upload-to-release@master
