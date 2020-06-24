@@ -26,8 +26,8 @@ jobs:
         run: |
           curl -OL http://kindlegen.s3.amazonaws.com/KindleGen_Mac_i386_v2_9.zip
           curl -OL http://kindlegen.s3.amazonaws.com/kindlegen_win32_v2_9.zip
-          unzip -d darwin KindleGen_Mac_i386_v2_9.zip
-          unzip -d widnows kindlegen_win32_v2_9.zip
+          unzip KindleGen_Mac_i386_v2_9.zip
+          unzip kindlegen_win32_v2_9.zip
 
       - name: Build
         run: |
