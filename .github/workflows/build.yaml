@@ -1,0 +1,64 @@
+name: Go
+
+on:
+  push:
+    branches: [ master ]
+  pull_request:
+    branches: [ master ]
+
+jobs:
+
+  build:
+    name: Build
+    runs-on: ubuntu-latest
+    steps:
+
+      - name: Set up Go 1.x
+        uses: actions/setup-go@v2
+        with:
+          go-version: ^1.13
+        id: go
+
+      - name: Check out code into the Go module directory
+        uses: actions/checkout@v2
+
+      - name: Get dependencies
+        run: |
+          curl -OL http://kindlegen.s3.amazonaws.com/KindleGen_Mac_i386_v2_9.zip
+          curl -OL http://kindlegen.s3.amazonaws.com/kindlegen_win32_v2_9.zip
+          unzip -d darwin KindleGen_Mac_i386_v2_9.zip
+          unzip -d widnows kindlegen_win32_v2_9.zip
+
+      - name: Build
+        run: |
+          GOOS=windows GOARCH=amd64 go build -ldflags "-s -w" -o TmdTextEpub.exe main.go
+          GOOS=windows GOARCH=386 go build -ldflags "-s -w" -o TmdTextEpub_32.exe main.go
+          GOOS=linux GOARCH=amd64 go build -ldflags "-s -w" -o TmdTextEpub-linux main.go
+          GOOS=darwin GOARCH=amd64 go build -ldflags "-s -w" -o TmdTextEpub-darwin main.go
+
+      - name: compression zip
+        run: |
+          zip TmdTextEpub-windows.zip kindlegen.exe TmdTextEpub.exe TmdTextEpub_32.exe
+          zip TmdTextEpub-darwin.zip kindlegen TmdTextEpub-darwin
+          zip TmdTextEpub-linux.zip TmdTextEpub-linux
+
+      - name: Upload windows to release
+        uses: JasonEtco/upload-to-release@master
+        with:
+          args: TmdTextEpub-windows.zip application/octet-stream
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Upload linux to release
+          uses: JasonEtco/upload-to-release@master
+          with:
+            args: TmdTextEpub-linux.zip application/octet-stream
+          env:
+            GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Upload mac to release
+          uses: JasonEtco/upload-to-release@master
+          with:
+            args: TmdTextEpub-darwin.zip application/octet-stream
+          env:
+            GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

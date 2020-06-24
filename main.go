@@ -211,13 +211,6 @@ func main() {
 			content.WriteString(htmlTitleEnd)
 			continue
 		}
-		if strings.HasSuffix(line, "==") ||
-			strings.HasSuffix(line, "**") ||
-			strings.HasSuffix(line, "--") ||
-			strings.HasSuffix(line, "//") {
-			content.WriteString(line)
-			continue
-		}
 		AddPart(&content, line)
 	}
 	// 没识别到章节又没识别到 EOF 时，把所有的内容写到最后一章
