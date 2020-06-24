@@ -36,8 +36,8 @@ jobs:
 
       - name: compression zip
         run: |
-          zip -J TmdTextEpub-windows.zip windows/kindlegen.exe TmdTextEpub.exe TmdTextEpub_32.exe
-          zip -J TmdTextEpub-darwin.zip darwin/kindlegen TmdTextEpub-darwin
+          zip -j TmdTextEpub-windows.zip windows/kindlegen.exe TmdTextEpub.exe TmdTextEpub_32.exe
+          zip -j TmdTextEpub-darwin.zip darwin/kindlegen TmdTextEpub-darwin
           zip TmdTextEpub-linux.zip TmdTextEpub-linux
 
       - name: Upload windows to release
