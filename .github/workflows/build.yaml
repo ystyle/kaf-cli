@@ -22,9 +22,9 @@ jobs:
 
       - name: Get dependencies
         run: |
-          curl -OL http://kindlegen.s3.amazonaws.com/KindleGen_Mac_i386_v2_9.zip
-          curl -OL http://kindlegen.s3.amazonaws.com/kindlegen_win32_v2_9.zip
-          unzip -d darwin KindleGen_Mac_i386_v2_9.zip
+          curl -OL https://github.com/ystyle/TmdTextEpub/releases/download/kindlegen/KindleGen_Mac_64bit_v2_9.zip
+          curl -OL https://github.com/ystyle/TmdTextEpub/releases/download/kindlegen/kindlegen_win32_v2_9.zip
+          unzip -d darwin KindleGen_Mac_64bit_v2_9.zip
           unzip -d windows kindlegen_win32_v2_9.zip
 
       - name: Build

@@ -26,18 +26,23 @@
 ### 命令行模式
 
 全部参数为：
-```$xslt
-Usage of D:\TmdTextEpub.exe:
+```shell
+Usage of TmdTextEpub.exe:
   -author string
         作者 (default "YSTYLE")
   -bookname string
         书名: 默认为txt文件名
   -filename string
         txt 文件名
+  -lang string
+        设置语言: en,de,fr,it,es,zh,ja,pt,ru,nl (default "zh") 。 支持使用环境变量KAF-CLI-LANG设置
   -match string
         匹配标题的正则表达式, 不写可以自动识别, 如果没生成章节就参考教程。例: -match 第.{1,8}章 表示第和章字之间可以有1-8个任意文字 (default "自动匹配,可自定义")
+  -max uint
+        标题最大字数 (default 35)
   -tips
         添加本软件教程 (default true)
+
 ```
 
 把`全职法师.txt`生成epub, 并设置作者名为`乱`

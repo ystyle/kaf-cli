@@ -73,7 +73,7 @@ func init() {
 		flag.StringVar(&bookname, "bookname", "", "书名: 默认为txt文件名")
 		flag.UintVar(&max, "max", 35, "标题最大字数")
 		flag.StringVar(&match, "match", DefaultMatchTips, "匹配标题的正则表达式, 不写可以自动识别, 如果没生成章节就参考教程。例: -match 第.{1,8}章 表示第和章字之间可以有1-8个任意文字")
-		flag.StringVar(&lang, "lang", "zh", "设置语言: en,de,fr,it,es,zh,ja,pt,ru,nl")
+		flag.StringVar(&lang, "lang", "zh", "设置语言: en,de,fr,it,es,zh,ja,pt,ru,nl。 支持使用环境变量KAF-CLI-LANG设置")
 		flag.BoolVar(&Tips, "tips", true, "添加本软件教程")
 		flag.Parse()
 	}
@@ -119,6 +119,10 @@ func main() {
 	if bookname == "" {
 		bookname = strings.Split(filepath.Base(filename), ".")[0]
 	}
+	if l := os.Getenv("KAF-CLI-LANG"); l != "" {
+		lang = l
+	}
+	lang = parseLang(lang)
 
 	fmt.Println("转换信息:")
 	fmt.Println("文件名:", filename)
@@ -127,6 +131,7 @@ func main() {
 		fmt.Println("作者:", author)
 	}
 	fmt.Println("匹配条件:", match)
+	fmt.Println("书籍语言:", lang)
 	fmt.Println()
 
 	// 编译正则表达式
@@ -151,8 +156,6 @@ func main() {
 	if err != nil {
 		panic(fmt.Sprintf("无法写入样式文件: %s", err))
 	}
-
-	lang = parseLang(lang)
 
 	start := time.Now()
 	// Create a ne EPUB
