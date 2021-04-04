@@ -191,6 +191,8 @@ func main() {
 			os.Exit(1)
 		}
 		line = strings.TrimSpace(line)
+		line = strings.ReplaceAll(line, "<", "&lt;")
+		line = strings.ReplaceAll(line, ">", "&gt;")
 		// 空行直接跳过
 		if len(line) == 0 {
 			continue
