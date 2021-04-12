@@ -17,7 +17,7 @@
 1. [点击下载](https://github.com/ystyle/TmdTextEpub/releases/latest)
    - [百度网盘 `https://pan.baidu.com/s/1EPkLJ7WIJYdYtRHBEMqw0w`](https://pan.baidu.com/s/1EPkLJ7WIJYdYtRHBEMqw0w) 提取码：`h4np`
      - 网盘有安卓APP版本
-   - Archlinux: 在au上安装 `yay -S kaf-cli`
+   - Archlinux: 在aur上安装 `yay -S kaf-cli`
 1. 解压, 把小说直接拖到 `TmdTextEpub.exe` 文件上面
 1. 等转换完，目录下会生成epub和mobi文件
 
