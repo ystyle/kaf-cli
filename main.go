@@ -44,7 +44,7 @@ const (
 .title {text-align:center}
 .content {text-indent: 2em}
 `
-	Tutorial = `本书由TmdTextEpub生成: <br/>
+	Tutorial = `本书由kaf-cli生成: <br/>
 制作教程: <a href='https://ystyle.top/2019/12/31/txt-converto-epub-and-mobi/'>https://ystyle.top/2019/12/31/txt-converto-epub-and-mobi</a>
 `
 )
@@ -145,7 +145,7 @@ func main() {
 	}
 
 	// 写入样式
-	tempDir, err := ioutil.TempDir("", "TmdTextEpub")
+	tempDir, err := ioutil.TempDir("", "kaf-cli")
 	defer func() {
 		if err := os.RemoveAll(tempDir); err != nil {
 			panic(fmt.Sprintf("创建临时文件夹失败: %s", err))

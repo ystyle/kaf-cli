@@ -22,41 +22,41 @@ jobs:
 
       - name: Get dependencies
         run: |
-          curl -OL https://github.com/ystyle/TmdTextEpub/releases/download/kindlegen/KindleGen_Mac_64bit_v2_9.zip
-          curl -OL https://github.com/ystyle/TmdTextEpub/releases/download/kindlegen/kindlegen_win32_v2_9.zip
+          curl -OL https://github.com/ystyle/kaf-cli/releases/download/kindlegen/KindleGen_Mac_64bit_v2_9.zip
+          curl -OL https://github.com/ystyle/kaf-cli/releases/download/kindlegen/kindlegen_win32_v2_9.zip
           unzip -d darwin KindleGen_Mac_64bit_v2_9.zip
           unzip -d windows kindlegen_win32_v2_9.zip
 
       - name: Build
         run: |
-          GOOS=windows GOARCH=amd64 go build -ldflags "-s -w" -o TmdTextEpub.exe main.go
-          GOOS=windows GOARCH=386 go build -ldflags "-s -w" -o TmdTextEpub_32.exe main.go
-          GOOS=linux GOARCH=amd64 go build -ldflags "-s -w" -o TmdTextEpub-linux main.go
-          GOOS=darwin GOARCH=amd64 go build -ldflags "-s -w" -o TmdTextEpub-darwin main.go
+          GOOS=windows GOARCH=amd64 go build -ldflags "-s -w" -o kaf-cli.exe main.go
+          GOOS=windows GOARCH=386 go build -ldflags "-s -w" -o kaf-cli_32.exe main.go
+          GOOS=linux GOARCH=amd64 go build -ldflags "-s -w" -o kaf-cli-linux main.go
+          GOOS=darwin GOARCH=amd64 go build -ldflags "-s -w" -o kaf-cli-darwin main.go
 
       - name: compression zip
         run: |
-          zip -j TmdTextEpub-windows.zip windows/kindlegen.exe TmdTextEpub.exe TmdTextEpub_32.exe
-          zip -j TmdTextEpub-darwin.zip darwin/kindlegen TmdTextEpub-darwin
-          zip TmdTextEpub-linux.zip TmdTextEpub-linux
+          zip -j kaf-cli-windows.zip windows/kindlegen.exe kaf-cli.exe kaf-cli_32.exe
+          zip -j kaf-cli-darwin.zip darwin/kindlegen kaf-cli-darwin
+          zip kaf-cli-linux.zip kaf-cli-linux
 
       - name: Upload windows to release
         uses: JasonEtco/upload-to-release@master
         with:
-          args: TmdTextEpub-windows.zip application/octet-stream
+          args: kaf-cli-windows.zip application/octet-stream
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Upload linux to release
         uses: JasonEtco/upload-to-release@master
         with:
-          args: TmdTextEpub-linux.zip application/octet-stream
+          args: kaf-cli-linux.zip application/octet-stream
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Upload mac to release
         uses: JasonEtco/upload-to-release@master
         with:
-          args: TmdTextEpub-darwin.zip application/octet-stream
+          args: kaf-cli-darwin.zip application/octet-stream
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

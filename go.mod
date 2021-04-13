@@ -1,4 +1,4 @@
-module github.com/ystyle/TmdTextEpub
+module github.com/ystyle/kaf-cli
 
 require (
 	github.com/bmaupin/go-epub v0.5.3
