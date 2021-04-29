@@ -46,7 +46,8 @@ Usage of kaf-cli.exe:
         添加本软件教程 (default true)
 
 ```
-PS: 在darwin上`-tips`参数要设置为false的方法 `kaf-cli -filename 小说.txt -tips=0`
+
+>PS: 在darwin上`-tips`参数要设置为false的方法 `kaf-cli -filename 小说.txt -tips=0`
 
 把`全职法师.txt`生成epub, 并设置作者名为`乱`
 ```shell
