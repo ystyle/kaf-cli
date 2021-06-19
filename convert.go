@@ -5,14 +5,16 @@ import (
 	"bytes"
 	"flag"
 	"fmt"
-	"github.com/766b/mobi"
 	"github.com/bmaupin/go-epub"
+	"github.com/leotaku/mobi"
 	"golang.org/x/net/html/charset"
 	"golang.org/x/text/encoding"
 	"golang.org/x/text/encoding/simplifiedchinese"
+	"golang.org/x/text/language"
 	"golang.org/x/text/transform"
 	"io"
 	"io/ioutil"
+	"math/rand"
 	"os"
 	"path"
 	"path/filepath"
@@ -48,16 +50,17 @@ var (
 )
 
 const (
-	htmlPStart       = `<p class="content">`
-	htmlPEnd         = "</p>"
-	htmlTitleStart   = `<h3 class="title">`
-	htmlTitleEnd     = "</h3>"
-	DefaultMatchTips = "自动匹配,可自定义"
-	cssContent       = `
+	htmlPStart         = `<p class="content">`
+	htmlPEnd           = "</p>"
+	htmlTitleStart     = `<h3 class="title">`
+	mobiTtmlTitleStart = `<h3 style="text-align:%s;">`
+	htmlTitleEnd       = "</h3>"
+	DefaultMatchTips   = "自动匹配,可自定义"
+	cssContent         = `
 .title {text-align:%s}
 .content {
-  margin-block-end: %s;
-  margin-block-start: 0;
+  margin-bottom: %s;
+  margin-top: 0;
   text-indent: %dem;
 }
 `
@@ -270,7 +273,7 @@ func Convert() {
 	if isMobi {
 		if hasKinldegen == "" {
 			// 生成kindle格式
-			//buildMobi(sectionList)
+			buildMobi(sectionList)
 		} else {
 			converToMobi(fmt.Sprintf("%s.epub", out))
 		}
@@ -279,44 +282,50 @@ func Convert() {
 	fmt.Println("\n转换完成! 总耗时:", end)
 }
 
-func wrapMobiCss(title, content string) []byte {
+func wrapMobiTitle(title, content string) string {
 	var buff bytes.Buffer
-	css := fmt.Sprintf(`style="margin-bottom: %s;margin-top: 0;text-indent: %dem;"`, bottom, indent)
-	buff.WriteString(strings.ReplaceAll(content, `class="content"`, css))
-	return buff.Bytes()
+	buff.WriteString(fmt.Sprintf(mobiTtmlTitleStart, align))
+	buff.WriteString(title)
+	buff.WriteString(htmlTitleEnd)
+	buff.WriteString(content)
+	return buff.String()
 }
 
 func buildMobi(sectionList []Section) {
 	fmt.Println("使用第三方库生成mobi, 不保证所有样式都能正常显示")
 	start := time.Now()
-	m, err := mobi.NewWriter(fmt.Sprintf("%s.mobi", out))
+	mb := mobi.Book{
+		Title:       bookname,
+		Authors:     []string{author},
+		CreatedDate: time.Now(),
+		Chapters:    []mobi.Chapter{},
+		Language:    language.MustParse(lang),
+		UniqueID:    rand.Uint32(),
+	}
+	css := fmt.Sprintf(cssContent, align, bottom, indent)
+	for _, section := range sectionList {
+		ch := mobi.Chapter{
+			Title:  section.Title,
+			Chunks: mobi.Chunks(wrapMobiTitle(section.Title, section.Content)),
+		}
+		mb.Chapters = append(mb.Chapters, ch)
+	}
+
+	mb.CSSFlows = []string{css}
+
+	// Convert book to PalmDB database
+	db := mb.Realize()
+
+	// Write database to file
+	f, _ := os.Create(fmt.Sprintf("%s.azw3", out))
+	err := db.Write(f)
 	if err != nil {
 		panic(err)
 	}
-
-	m.Title(bookname)
-	m.Compression(mobi.CompressionNone) // LZ77 compression is also possible using  mobi.CompressionPalmDoc
-	if cover != "" {
-		// Add cover image
-		m.AddCover(cover, cover)
-	}
-
-	// Meta data
-	m.NewExthRecord(mobi.EXTH_DOCTYPE, "EBOK")
-	m.NewExthRecord(mobi.EXTH_AUTHOR, author)
-	// See exth.go for additional EXTH record IDs
-
-	// Add chapters and subchapters
-	for _, section := range sectionList {
-		m.NewChapter(section.Title, wrapMobiCss(section.Title, section.Content))
-	}
-
-	// Output MOBI File
-	m.Write()
 	fmt.Println("生成Mobi电子书耗时:", time.Now().Sub(start))
 }
 
-func wrapTitle(title, content string) string {
+func wrapEpubTitle(title, content string) string {
 	var buff bytes.Buffer
 	buff.WriteString(htmlTitleStart)
 	buff.WriteString(title)
@@ -360,7 +369,7 @@ func buildEpub(sectionList []Section) {
 	}
 
 	for _, section := range sectionList {
-		e.AddSection(wrapTitle(section.Title, section.Content), section.Title, "", css)
+		e.AddSection(wrapEpubTitle(section.Title, section.Content), section.Title, "", css)
 	}
 
 	// Write the EPUB
