@@ -29,10 +29,10 @@ jobs:
 
       - name: Build
         run: |
-          GOOS=windows GOARCH=amd64 go build -ldflags "-s -w" -o kaf-cli.exe main.go
-          GOOS=windows GOARCH=386 go build -ldflags "-s -w" -o kaf-cli_32.exe main.go
-          GOOS=linux GOARCH=amd64 go build -ldflags "-s -w" -o kaf-cli-linux main.go
-          GOOS=darwin GOARCH=amd64 go build -ldflags "-s -w" -o kaf-cli-darwin main.go
+          GOOS=windows GOARCH=amd64 go build -ldflags "-s -w" -o kaf-cli.exe cmd/cli.go
+          GOOS=windows GOARCH=386 go build -ldflags "-s -w" -o kaf-cli_32.exe cmd/cli.go
+          GOOS=linux GOARCH=amd64 go build -ldflags "-s -w" -o kaf-cli-linux cmd/cli.go
+          GOOS=darwin GOARCH=amd64 go build -ldflags "-s -w" -o kaf-cli-darwin cmd/cli.go
 
       - name: compression zip
         run: |
