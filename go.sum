@@ -1,5 +1,3 @@
-github.com/766b/mobi v0.0.0-20200528201125-c87aa9e3c890 h1:5EBpQM2h7OdIRR1jw1IypiKzbYo/8Hx5/iRxgqPSKFI=
-github.com/766b/mobi v0.0.0-20200528201125-c87aa9e3c890/go.mod h1:ut/OVrYa64AAfis3e0GO4uEb8mwXSJoqAqnIMQd24HQ=
 github.com/bmaupin/go-epub v0.5.3 h1:HBOJS2KqsRGGcEzM470/9l5q2l9JwAUxQabEgPMrW90=
 github.com/bmaupin/go-epub v0.5.3/go.mod h1:4RBr0Zo03mRGOyGAcc25eLOqIPCkMbfz+tINVmH6clQ=
 github.com/gofrs/uuid v3.1.0+incompatible h1:q2rtkjaKT4YEr6E1kamy0Ha4RtepWlQBedyHx0uzKwA=
@@ -8,6 +6,8 @@ github.com/golang/text v0.3.2 h1:vDAeTQXl8YUdGoj2vMsMnzHi1xMJJ9S7iwnTBFL/pkA=
 github.com/golang/text v0.3.2/go.mod h1:bEr9sfX3Q8Zfm5fL9x+3itogRgK3+ptLWKqgva+5dAk=
 github.com/leotaku/mobi v0.0.0-20210521204648-1e0b6b1462b0 h1:+9O0BGpTNT1MJrMnBVUiKSznQ+GZKOIFaCqFI57J+Yc=
 github.com/leotaku/mobi v0.0.0-20210521204648-1e0b6b1462b0/go.mod h1:JwlrCjmFTdgBpRBpZaEWzPcCKC3RVh5zSCSbCEpKscA=
+github.com/ystyle/google-analytics v0.0.0-20210425064301-a7f754dd0649 h1:2uiow2Fw91jCIiYwMKvPF/lUMMdtVjgVpwqTcbC0fPU=
+github.com/ystyle/google-analytics v0.0.0-20210425064301-a7f754dd0649/go.mod h1:j2L81Z+juG+93VLJWQL25LeFnI2LygARlF/YbdAo2vg=
 golang.org/x/crypto v0.0.0-20190308221718-c2843e01d9a2/go.mod h1:djNgcEr1/C05ACkg1iLfiJU5Ep61QUkGW8qpdssI0+w=
 golang.org/x/net v0.0.0-20200301022130-244492dfa37a h1:GuSPYbZzB5/dcLNCwLQLsg3obCJtX9IJhpXkvY7kzk0=
 golang.org/x/net v0.0.0-20200301022130-244492dfa37a/go.mod h1:z5CRVTTTmAJ677TzLLGU+0bjPO0LkuOLi4/5GtJWs/s=

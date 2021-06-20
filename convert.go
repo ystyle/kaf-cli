@@ -12,6 +12,9 @@ import (
 	"golang.org/x/text/encoding/simplifiedchinese"
 	"golang.org/x/text/language"
 	"golang.org/x/text/transform"
+	"image"
+	_ "image/jpeg"
+	_ "image/png"
 	"io"
 	"io/ioutil"
 	"math/rand"
@@ -258,7 +261,11 @@ func parseBook() []Section {
 
 func Convert() {
 	start := time.Now()
+	// 解析文本
 	sectionList := parseBook()
+	fmt.Println()
+
+	// 判断要生成的格式
 	var isEpub, isMobi = true, true
 	if format == "epub" {
 		isMobi = false
@@ -267,14 +274,16 @@ func Convert() {
 	if isMobi && hasKinldegen == "" {
 		isEpub = false
 	}
+	// 生成epub
 	if isEpub {
 		buildEpub(sectionList)
+		fmt.Println()
 	}
+	// 生成kindle格式
 	if isMobi {
-		if hasKinldegen == "" {
-			// 生成kindle格式
-			buildMobi(sectionList)
-		} else {
+		// 生成kindle格式
+		buildMobi(sectionList)
+		if hasKinldegen != "" {
 			converToMobi(fmt.Sprintf("%s.epub", out))
 		}
 	}
@@ -292,7 +301,8 @@ func wrapMobiTitle(title, content string) string {
 }
 
 func buildMobi(sectionList []Section) {
-	fmt.Println("使用第三方库生成mobi, 不保证所有样式都能正常显示")
+	fmt.Println("使用第三方库生成azw3, 不保证所有样式都能正常显示")
+	fmt.Println("正在生成azw3...")
 	start := time.Now()
 	mb := mobi.Book{
 		Title:       bookname,
@@ -312,6 +322,17 @@ func buildMobi(sectionList []Section) {
 	}
 
 	mb.CSSFlows = []string{css}
+	if cover != "" {
+		f, err := os.Open(cover)
+		if err != nil {
+			panic(err)
+		}
+		img, _, err := image.Decode(f)
+		if err != nil {
+			panic(err)
+		}
+		mb.CoverImage = img
+	}
 
 	// Convert book to PalmDB database
 	db := mb.Realize()

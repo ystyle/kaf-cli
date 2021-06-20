@@ -2,6 +2,8 @@ package kafcli
 
 import (
 	"fmt"
+	"io/ioutil"
+	"math/rand"
 	"os"
 	"os/exec"
 	"path"
@@ -60,4 +62,27 @@ func isExists(path string) (bool, error) {
 		return false, nil
 	}
 	return false, err
+}
+
+func getClientID() string {
+	clientID := fmt.Sprintf("%d", rand.Uint32())
+	config, err := os.UserConfigDir()
+	if err != nil {
+		return clientID
+	}
+	filepath := fmt.Sprintf("%s/kaf-wifi/config", config)
+	if exist, _ := isExists(filepath); exist {
+		bs, err := ioutil.ReadFile(filepath)
+		if err != nil {
+			return clientID
+		}
+		clientID = string(bs)
+	} else {
+		err := os.MkdirAll(fmt.Sprintf("%s/kaf-wifi", config), 0700)
+		if err != nil {
+			return clientID
+		}
+		_ = os.WriteFile(filepath, []byte(clientID), 0700)
+	}
+	return clientID
 }
