@@ -4,50 +4,71 @@
 
 ### 功能
 - 傻瓜操作模式(把txt文件拖到`kaf-cli.exe`上面自动转换)
+- 自定义封面
 - 自动识别书名和章节(示例中所有用法都会自动识别)
 - 自动识别字符编码(自动解决中文乱码)
 - 自定义章节匹配
 - 自动给章节正文生成加粗居中的标题
+- 自定义标题对齐方式
 - 段落自动识别
 - 段落自动缩进
+- 自定义段落缩进字数
+- 自定义段落间距
+- 自定义书籍语言
 - 超快速(130章/s以上速度, 4000章30s不到)
 - 自动转为mobi格式
 
-### 使用方法
-1. [点击下载](https://github.com/ystyle/kaf-cli/releases/latest)
-   - [百度网盘 `https://pan.baidu.com/s/1EPkLJ7WIJYdYtRHBEMqw0w`](https://pan.baidu.com/s/1EPkLJ7WIJYdYtRHBEMqw0w) 提取码：`h4np`
-     - 网盘有安卓APP版本
-   - Archlinux: 在aur上安装 `yay -S kaf-cli`
-1. 解压, 把小说直接拖到 `kaf-cli.exe` 文件上面
-1. 等转换完，目录下会生成epub和mobi文件
+### 下载
+- 电脑版kaf-cli: [Github下载](https://github.com/ystyle/kaf-cli/releases/latest)
+- 手机版kaf: [Github下载](https://github.com/ystyle/kaf-cli/releases/tag/android)
+- 电脑版kaf-wifi: [Github下载](https://github.com/ystyle/kaf-wifi/releases/latest)
+- 全部软件 [百度网盘下载 `https://pan.baidu.com/s/1EPkLJ7WIJYdYtRHBEMqw0w`](https://pan.baidu.com/s/1EPkLJ7WIJYdYtRHBEMqw0w) 提取码：`h4np`
+- Archlinux 可以在aur上安装 [`yay -S kaf-cli kaf-wifi`](https://aur.archlinux.org/packages/kaf-cli/)
 
+### 使用方法
+1. 解压, 把小说直接拖到 `kaf-cli.exe` 文件上面
+1. 等转换完，目录下会生成epub、azw3、mobi文件
+   - mobi格式需要有kindlegen才会生成(windows、mac版本已经自带)
+1. 自定义封面功能
+   在拖拽模式下, 如果目录下有`cover.png`文件会自动添加为封面、支持jpg、png格式， 如果需要指定其它文件或jpg格式需要使用命令行模式   
+1. 其它自定义功能请用命令行模式
 
 ### 效果
 ![效果图片](2020-01-21_12-02.png)
 
-### 命令行模式
+### 命令行模式参数
 
-全部参数为：
 ```shell
 Usage of kaf-cli.exe:
+  -align string
+        标题对齐方式: left、center、righ (default "center")
   -author string
         作者 (default "YSTYLE")
   -bookname string
         书名: 默认为txt文件名
+  -bottom string
+        段落间距(单位可以为em、px) (default "1em")
+  -cover string
+        封面图片 (default "cover.png")
   -filename string
         txt 文件名
+  -format string
+        书籍格式: both、epub、mobi (default "both")
+  -indent uint
+        段落缩进字数 (default 2)
   -lang string
-        设置语言: en,de,fr,it,es,zh,ja,pt,ru,nl (default "zh") 。 支持使用环境变量KAF-CLI-LANG设置
+        设置语言: en,de,fr,it,es,zh,ja,pt,ru,nl。 支持使用环境变量KAF-CLI-LANG设置 (default "zh")
   -match string
         匹配标题的正则表达式, 不写可以自动识别, 如果没生成章节就参考教程。例: -match 第.{1,8}章 表示第和章字之间可以有1-8个任意文字 (default "自动匹配,可自定义")
   -max uint
         标题最大字数 (default 35)
   -tips
         添加本软件教程 (default true)
-
 ```
 
->PS: 在darwin上`-tips`参数要设置为false的方法 `kaf-cli -filename 小说.txt -tips=0`
+>PS: 在darwin(mac)上`-tips`参数要设置为false的方法 `kaf-cli -filename 小说.txt -tips=0`
+
+### 命令行模式说明
 
 把`全职法师.txt`生成epub, 并设置作者名为`乱`
 ```shell
@@ -81,7 +102,6 @@ d:/kaf-cli.exe -filename d:/ebbok.txt -match "Chapter .{1,8}"
 
 
 ### 在任意位置执行命令
-
 - 把`kaf-cli.exe` 和 `kindlegen.exe` 放`c:/windows/`下边
 - 以后可以把小说放任意目录，都可以很简单执行转换， 第一步只需要做一次， 以下为每次转换小说的操作，
   - 打开小说在的文件夹, 按住`Shift键`不放，鼠标右击文件夹空白位置
@@ -91,11 +111,11 @@ d:/kaf-cli.exe -filename d:/ebbok.txt -match "Chapter .{1,8}"
 ### 手动把书转为kindle的mobi格式
 >新版如果检测到有kindlegen程序时会自动转为mobi
 
-1. 在官网下载[kindlegen](https://www.amazon.com/gp/feature.html?ie=UTF8&docId=1000765211)
-2. 同样放到`d:`盘根目录下， 执行以下命令转换
+1. 下载[kindlegen](https://github.com/ystyle/kaf-cli/releases/download/kindlegen/kindlegen_win32_v2_9.zip) (github备份，官网已经不提供下载)
+2. 同样放到`d:`盘根目录下， 把epub拖拽到kindlegen.exe上面， 或执行以下命令转换
   ```shell
   cd d:/
   d:/kindlegen.exe d:/全职法师.epub
   ```
-3. 在d盘就能找到mobi文件了，复制到kindle的documents目录下，打开kindle就能看到小说了
+3. 在d盘就能找到mobi文件，复制到kindle的documents目录下，打开kindle就能看到小说了
 
