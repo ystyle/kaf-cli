@@ -92,7 +92,7 @@ kaf-cli ~/全职法师.txt
 ### 自定义章节匹配规则
 >以下全部示例都可以自动识别，不需要自己设定标题格式了， 一般用上用上面的例子就行了
 
->要自定义标题格式参考以下几个例子, 以下例子小说都在D盘
+>规则支持[正则表达式](http://deerchao.net/tutorials/regex/regex.htm)， 要自定义标题格式参考以下几个例子, 以下例子小说都在D盘
 
 
 
@@ -113,17 +113,21 @@ d:/kaf-cli.exe -filename d:/ebbok.txt -match "Chapter .{1,8}"
 
 
 ### 在任意位置执行命令
-- 把`kaf-cli.exe` 和 `kindlegen.exe` 放`c:/windows/`下边
-  - linux 可以放任意地方, 比如`~/application/kaf-cli`，在`~/.bashrc` 或 `~/.zshrc` 最后一行添加 `export PATH=$HOME/application:$PATH`
-- 以后可以把小说放任意目录，都可以很简单执行转换， 第一步只需要做一次， 以下为每次转换小说的操作，
-  - 打开小说在的文件夹, 按住`Shift键`不放，鼠标右击文件夹空白位置
-  - 在右键菜单选择 `用命令行打开` 或 `以PowerShell打开`
-  - 以上命令可以改为 `kaf-cli.exe -filename 全职法师.txt`,  现在可以不用写盘符了
+- windows
+  - 把`kaf-cli.exe` 和 `kindlegen.exe` 放`c:/windows/`下边
+  - 以后可以把小说放任意目录，都可以很简单执行转换， 第一步只需要做一次， 以下为每次转换小说的操作，
+    - 打开小说在的文件夹, 按住`Shift键`不放，鼠标右击文件夹空白位置
+    - 在右键菜单选择 `用命令行打开` 或 `以PowerShell打开`
+    - 以上命令可以改为 `kaf-cli.exe -filename 全职法师.txt`,  现在可以不用写盘符了
+- linux(理论上mac也可以是这样的)
+  - 软件可以放任意地方, 比如`~/application/kaf-cli`，在`~/.bashrc` 或 `~/.zshrc` 最后一行添加 `export PATH=$HOME/application:$PATH`
+  - 打开终端, 执行命令为: `kaf-cli -filename ~/全职法师.txt`
+
 
 ### 手动把书转为kindle的mobi格式
 >新版如果检测到有kindlegen程序时会自动转为mobi
 
-1. 下载[kindlegen](https://github.com/ystyle/kaf-cli/releases/download/kindlegen/kindlegen_win32_v2_9.zip) (github备份，官网已经不提供下载)
+1. 下载[kindlegen](https://github.com/ystyle/kaf-cli/releases/kindlegen/) (github备份，官网已经不提供下载)
 2. 同样放到`d:`盘根目录下， 把epub拖拽到kindlegen.exe上面， 或执行以下命令转换
   ```shell
   cd d:/
