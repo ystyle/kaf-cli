@@ -21,7 +21,7 @@
 ### 下载
 - 电脑版kaf-cli: [Github下载](https://github.com/ystyle/kaf-cli/releases/latest)
 - 手机版kaf: [Github下载](https://github.com/ystyle/kaf-cli/releases/tag/android)
-- 电脑版kaf-wifi(wifi传书): [Github下载](https://github.com/ystyle/kaf-wifi/releases/latest)
+- 电脑版wifi传书kaf-wifi: [Github下载](https://github.com/ystyle/kaf-wifi/releases/latest)
 - 全部软件 [百度网盘下载 `https://pan.baidu.com/s/1EPkLJ7WIJYdYtRHBEMqw0w`](https://pan.baidu.com/s/1EPkLJ7WIJYdYtRHBEMqw0w) 提取码：`h4np`
 - Archlinux 可以在aur上安装 [`yay -S kaf-cli kaf-wifi`](https://aur.archlinux.org/packages/kaf-cli/)
 
@@ -84,35 +84,37 @@ cd ~
 
 # 如果kaf-cli放到path里了, 或者在aur安装的可以执行:
 kaf-cli -author 乱 -filename ~/全职法师.txt
+
+# 命令行的简单模式（功能和拖拽模式一样）
+kaf-cli ~/全职法师.txt
 ```
 
-
+### 自定义章节匹配规则
 >以下全部示例都可以自动识别，不需要自己设定标题格式了， 一般用上用上面的例子就行了
 
->要自定义标题格式参考以下几个例子
+>要自定义标题格式参考以下几个例子, 以下例子小说都在D盘
+
 
 
 自定义章节匹配, 章节格式为`第x节`: 
 ```shell
-cd d:/
 d:/kaf-cli.exe -filename d:/ebbok.txt -match "第.{1,8}节"
 ```
 
 自定义章节匹配, 章节格式为`Section 1` ~ `Section 100`: 
 ```shell
-cd d:/
 d:/kaf-cli.exe -filename d:/ebbok.txt -match "Section \d+"
 ```
 
 自定义章节匹配, 章节格式为`Chapter xxx`: 
 ```shell
-cd d:/
 d:/kaf-cli.exe -filename d:/ebbok.txt -match "Chapter .{1,8}"
 ```
 
 
 ### 在任意位置执行命令
 - 把`kaf-cli.exe` 和 `kindlegen.exe` 放`c:/windows/`下边
+  - linux 可以放任意地方, 比如`~/application/kaf-cli`，在`~/.bashrc` 或 `~/.zshrc` 最后一行添加 `export PATH=$HOME/application:$PATH`
 - 以后可以把小说放任意目录，都可以很简单执行转换， 第一步只需要做一次， 以下为每次转换小说的操作，
   - 打开小说在的文件夹, 按住`Shift键`不放，鼠标右击文件夹空白位置
   - 在右键菜单选择 `用命令行打开` 或 `以PowerShell打开`
