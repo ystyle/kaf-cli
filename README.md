@@ -21,7 +21,7 @@
 ### 下载
 - 电脑版kaf-cli: [Github下载](https://github.com/ystyle/kaf-cli/releases/latest)
 - 手机版kaf: [Github下载](https://github.com/ystyle/kaf-cli/releases/tag/android)
-- 电脑版kaf-wifi: [Github下载](https://github.com/ystyle/kaf-wifi/releases/latest)
+- 电脑版kaf-wifi(wifi传书): [Github下载](https://github.com/ystyle/kaf-wifi/releases/latest)
 - 全部软件 [百度网盘下载 `https://pan.baidu.com/s/1EPkLJ7WIJYdYtRHBEMqw0w`](https://pan.baidu.com/s/1EPkLJ7WIJYdYtRHBEMqw0w) 提取码：`h4np`
 - Archlinux 可以在aur上安装 [`yay -S kaf-cli kaf-wifi`](https://aur.archlinux.org/packages/kaf-cli/)
 
@@ -73,8 +73,17 @@ Usage of kaf-cli.exe:
 
 把`全职法师.txt`生成epub, 并设置作者名为`乱`
 ```shell
+# windows 10: win + s 搜索powershell 
 cd d:/
 d:/kaf-cli.exe -author 乱 -filename d:/全职法师.txt
+
+# linux / mac下, 把kaf-cli-linux/kaf-cli-darwin重命名为kaf-cli, 放到用户目录
+# 把小说和kaf-cli放到用户目录下,  打开终端执行
+cd ~
+./kaf-cli -author 乱 -filename ./全职法师.txt
+
+# 如果kaf-cli放到path里了, 或者在aur安装的可以执行:
+kaf-cli -author 乱 -filename ~/全职法师.txt
 ```
 
 
