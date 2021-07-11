@@ -24,6 +24,7 @@
 - 电脑版wifi传书kaf-wifi: [Github下载](https://github.com/ystyle/kaf-wifi/releases/latest)
 - 全部软件 [百度网盘下载 `https://pan.baidu.com/s/1EPkLJ7WIJYdYtRHBEMqw0w`](https://pan.baidu.com/s/1EPkLJ7WIJYdYtRHBEMqw0w) 提取码：`h4np`
 - Archlinux 可以在aur上安装 [`yay -S kaf-cli kaf-wifi`](https://aur.archlinux.org/packages/kaf-cli/)
+- Windows 可以在`chocolatey`上安装`choco install kaf-cli kaf-wifi`
 
 ### 使用方法
 1. 解压, 把小说直接拖到 `kaf-cli.exe` 文件上面
