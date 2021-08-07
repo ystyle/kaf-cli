@@ -50,7 +50,7 @@ func converToMobi(bookname string) {
 	run(command, "-dont_append_source", "-locale", lang, "-c1", bookname)
 	// 计算耗时
 	end := time.Now().Sub(start)
-	fmt.Println("转换为Kindle格式耗时:", end)
+	fmt.Println("转换为mobi格式耗时:", end)
 }
 
 func isExists(path string) (bool, error) {

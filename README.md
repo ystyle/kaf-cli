@@ -54,7 +54,7 @@ Usage of kaf-cli.exe:
   -filename string
         txt 文件名
   -format string
-        书籍格式: both、epub、mobi (default "both")
+        书籍格式: all、epub、mobi、azw3 (default "all")
   -indent uint
         段落缩进字数 (default 2)
   -lang string

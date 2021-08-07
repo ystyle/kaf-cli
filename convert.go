@@ -33,23 +33,22 @@ type Section struct {
 }
 
 var (
-	filename         string // 目录
-	bookname         string // 书名
-	match            string // 正则
-	author           string // 作者
-	max              uint   // 标题最大字数
-	indent           uint   // 段落缩进字段
-	align            string // 标题对齐方式
-	cover            string // 封面图片
-	bottom           string // 段阿落间距
-	Tips             bool   // 是否添加教程文本
-	lang             string // 设置语言
-	out              string // 输出文件名
-	format           string // 书籍格式
-	decoder          *encoding.Decoder
-	pageStylesFile   string
-	reg              *regexp.Regexp
-	installKindlegen bool
+	filename       string // 目录
+	bookname       string // 书名
+	match          string // 正则
+	author         string // 作者
+	max            uint   // 标题最大字数
+	indent         uint   // 段落缩进字段
+	align          string // 标题对齐方式
+	cover          string // 封面图片
+	bottom         string // 段阿落间距
+	Tips           bool   // 是否添加教程文本
+	lang           string // 设置语言
+	out            string // 输出文件名
+	format         string // 书籍格式
+	decoder        *encoding.Decoder
+	pageStylesFile string
+	reg            *regexp.Regexp
 )
 
 const (
@@ -97,7 +96,7 @@ func init() {
 		flag.StringVar(&align, "align", "center", "标题对齐方式: left、center、righ")
 		flag.StringVar(&cover, "cover", "cover.png", "封面图片")
 		flag.StringVar(&bottom, "bottom", "1em", "段落间距(单位可以为em、px)")
-		flag.StringVar(&format, "format", "both", "书籍格式: both、epub、mobi")
+		flag.StringVar(&format, "format", "all", "书籍格式: all、epub、mobi、azw3")
 		flag.StringVar(&lang, "lang", "zh", "设置语言: en,de,fr,it,es,zh,ja,pt,ru,nl。 支持使用环境变量KAF-CLI-LANG设置")
 		flag.BoolVar(&Tips, "tips", true, "添加本软件教程")
 		flag.Parse()
@@ -105,6 +104,12 @@ func init() {
 
 	if filename == "" {
 		fmt.Println("文件名不能为空")
+		fmt.Println("简洁模式: 直接把文件播放到kaf-cli上")
+		fmt.Println("命令行简单模式: kaf-cli ebook.txt")
+		fmt.Println("查看命令行参数: kaf-cli -h")
+		fmt.Println("以下为kaf-cli的全部参数")
+		flag.PrintDefaults()
+		time.Sleep(time.Second * 10)
 		os.Exit(1)
 	}
 
@@ -266,10 +271,21 @@ func Convert() {
 	fmt.Println()
 
 	// 判断要生成的格式
-	var isEpub, isMobi = true, true
-	if format == "epub" {
-		isMobi = false
+	var isEpub, isMobi, isAzw3 bool
+	switch format {
+	case "epub":
+		isEpub = true
+	case "mobi":
+		isEpub = true
+		isMobi = true
+	case "azw3":
+		isAzw3 = true
+	default:
+		isEpub = true
+		isMobi = true
+		isAzw3 = true
 	}
+
 	hasKinldegen := lookKindlegen()
 	if isMobi && hasKinldegen == "" {
 		isEpub = false
@@ -279,10 +295,13 @@ func Convert() {
 		buildEpub(sectionList)
 		fmt.Println()
 	}
-	// 生成kindle格式
-	if isMobi {
+	// 生成azw3格式
+	if isAzw3 {
 		// 生成kindle格式
-		buildMobi(sectionList)
+		buildAzw3(sectionList)
+	}
+	// 生成mobi格式
+	if isMobi {
 		if hasKinldegen != "" {
 			converToMobi(fmt.Sprintf("%s.epub", out))
 		}
@@ -300,7 +319,7 @@ func wrapMobiTitle(title, content string) string {
 	return buff.String()
 }
 
-func buildMobi(sectionList []Section) {
+func buildAzw3(sectionList []Section) {
 	fmt.Println("使用第三方库生成azw3, 不保证所有样式都能正常显示")
 	fmt.Println("正在生成azw3...")
 	start := time.Now()
@@ -343,7 +362,7 @@ func buildMobi(sectionList []Section) {
 	if err != nil {
 		panic(err)
 	}
-	fmt.Println("生成Mobi电子书耗时:", time.Now().Sub(start))
+	fmt.Println("生成azw3电子书耗时:", time.Now().Sub(start))
 }
 
 func wrapEpubTitle(title, content string) string {
