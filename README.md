@@ -15,6 +15,7 @@
 - 自定义段落缩进字数
 - 自定义段落间距
 - 自定义书籍语言
+- 知轩藏书格式文件名会自动提取书名和作者, 例: `《希灵帝国》（校对版全本）作者：远瞳.txt`
 - 超快速(130章/s以上速度, 4000章30s不到)
 - 自动转为mobi格式
 
@@ -39,7 +40,7 @@
 
 ### 命令行模式参数
 
-```shell
+```text
 Usage of kaf-cli.exe:
   -align string
         标题对齐方式: left、center、righ (default "center")
@@ -58,16 +59,19 @@ Usage of kaf-cli.exe:
   -indent uint
         段落缩进字数 (default 2)
   -lang string
-        设置语言: en,de,fr,it,es,zh,ja,pt,ru,nl。 支持使用环境变量KAF-CLI-LANG设置 (default "zh")
+        设置语言: en,de,fr,it,es,zh,ja,pt,ru,nl。 环境变量KAF_CLI_LANG可修改默认值 (default "zh")
   -match string
         匹配标题的正则表达式, 不写可以自动识别, 如果没生成章节就参考教程。例: -match 第.{1,8}章 表示第和章字之间可以有1-8个任意文字 (default "自动匹配,可自定义")
   -max uint
         标题最大字数 (default 35)
+  -out string
+        输出文件名，不需要包含格式后缀
   -tips
         添加本软件教程 (default true)
+
 ```
 
->PS: 在darwin(mac)上`-tips`参数要设置为false的方法 `kaf-cli -filename 小说.txt -tips=0`
+>PS: 在darwin(mac、osx)上`-tips`参数要设置为false的方法 `kaf-cli -filename 小说.txt -tips=0`
 
 ### 命令行模式说明
 

@@ -3,53 +3,53 @@ package kafcli
 import (
 	"bufio"
 	"bytes"
+	"errors"
 	"flag"
 	"fmt"
-	"github.com/bmaupin/go-epub"
-	"github.com/leotaku/mobi"
 	"golang.org/x/net/html/charset"
 	"golang.org/x/text/encoding"
 	"golang.org/x/text/encoding/simplifiedchinese"
-	"golang.org/x/text/language"
 	"golang.org/x/text/transform"
-	"image"
 	_ "image/jpeg"
 	_ "image/png"
 	"io"
 	"io/ioutil"
-	"math/rand"
 	"os"
-	"path"
-	"path/filepath"
 	"regexp"
+	"runtime"
 	"strings"
 	"time"
 	"unicode/utf8"
 )
+
+type Book struct {
+	Filename       string    // 目录
+	Bookname       string    // 书名
+	Match          string    // 正则
+	Author         string    // 作者
+	Max            uint      // 标题最大字数
+	Indent         uint      // 段落缩进字段
+	Align          string    // 标题对齐方式
+	Cover          string    // 封面图片
+	Bottom         string    // 段阿落间距
+	Tips           bool      // 是否添加教程文本
+	Lang           string    // 设置语言
+	Out            string    // 输出文件名
+	Format         string    // 书籍格式
+	SectionList    []Section // 章节
+	Decoder        *encoding.Decoder
+	PageStylesFile string
+	Reg            *regexp.Regexp
+}
 
 type Section struct {
 	Title   string
 	Content string
 }
 
-var (
-	filename       string // 目录
-	bookname       string // 书名
-	match          string // 正则
-	author         string // 作者
-	max            uint   // 标题最大字数
-	indent         uint   // 段落缩进字段
-	align          string // 标题对齐方式
-	cover          string // 封面图片
-	bottom         string // 段阿落间距
-	Tips           bool   // 是否添加教程文本
-	lang           string // 设置语言
-	out            string // 输出文件名
-	format         string // 书籍格式
-	decoder        *encoding.Decoder
-	pageStylesFile string
-	reg            *regexp.Regexp
-)
+type Converter interface {
+	Build(book Book) error
+}
 
 const (
 	htmlPStart         = `<p class="content">`
@@ -57,7 +57,7 @@ const (
 	htmlTitleStart     = `<h3 class="title">`
 	mobiTtmlTitleStart = `<h3 style="text-align:%s;">`
 	htmlTitleEnd       = "</h3>"
-	DefaultMatchTips   = "自动匹配,可自定义"
+	DefaultMatchTips   = "^.{0,8}(第.{1,20}[章节卷]|[Ss]ection.{1,20}|[Cc]hapter.{1,20}|[Pp]age.{1,20})|^\\d{1,4}$|^引子|^楔子|^章节目录|^章节"
 	cssContent         = `
 .title {text-align:%s}
 .content {
@@ -71,92 +71,96 @@ const (
 `
 )
 
-// 解析程序参数
-func init() {
-	if len(os.Args) == 2 && strings.HasSuffix(os.Args[1], ".txt") {
-		fmt.Println("傻瓜模式开启...")
-		filename = os.Args[1]
-		author = "YSTYLE"
-		max = 35
-		match = DefaultMatchTips
-		Tips = true
-		lang = "zh"
-		indent = 2
-		align = "center"
-		cover = "cover.png"
-		bottom = "1em"
-		format = "both"
-	} else {
-		flag.StringVar(&filename, "filename", "", "txt 文件名")
-		flag.StringVar(&author, "author", "YSTYLE", "作者")
-		flag.StringVar(&bookname, "bookname", "", "书名: 默认为txt文件名")
-		flag.UintVar(&max, "max", 35, "标题最大字数")
-		flag.StringVar(&match, "match", DefaultMatchTips, "匹配标题的正则表达式, 不写可以自动识别, 如果没生成章节就参考教程。例: -match 第.{1,8}章 表示第和章字之间可以有1-8个任意文字")
-		flag.UintVar(&indent, "indent", 2, "段落缩进字数")
-		flag.StringVar(&align, "align", "center", "标题对齐方式: left、center、righ")
-		flag.StringVar(&cover, "cover", "cover.png", "封面图片")
-		flag.StringVar(&bottom, "bottom", "1em", "段落间距(单位可以为em、px)")
-		flag.StringVar(&format, "format", "all", "书籍格式: all、epub、mobi、azw3")
-		flag.StringVar(&lang, "lang", "zh", "设置语言: en,de,fr,it,es,zh,ja,pt,ru,nl。 支持使用环境变量KAF-CLI-LANG设置")
-		flag.BoolVar(&Tips, "tips", true, "添加本软件教程")
-		flag.Parse()
+func NewBookSimple(filename string) (*Book, error) {
+	if !strings.HasSuffix(filename, ".txt") {
+		return nil, errors.New("不是txt文件")
 	}
-
-	if filename == "" {
-		fmt.Println("文件名不能为空")
-		fmt.Println("简洁模式: 直接把文件播放到kaf-cli上")
-		fmt.Println("命令行简单模式: kaf-cli ebook.txt")
-		fmt.Println("查看命令行参数: kaf-cli -h")
-		fmt.Println("以下为kaf-cli的全部参数")
-		flag.PrintDefaults()
-		time.Sleep(time.Second * 10)
-		os.Exit(1)
+	book := Book{
+		Filename:       filename,
+		Bookname:       "",
+		Match:          DefaultMatchTips,
+		Author:         "YSTYLE",
+		Max:            35,
+		Indent:         2,
+		Align:          "center",
+		Cover:          "cover.png",
+		Bottom:         "1em",
+		Tips:           true,
+		Lang:           "zh",
+		Out:            "",
+		Format:         "all",
+		SectionList:    nil,
+		Decoder:        nil,
+		PageStylesFile: "",
+		Reg:            nil,
 	}
-
-	if bookname == "" {
-		bookname = strings.Split(filepath.Base(filename), ".")[0]
+	if os.Getenv("KAF_CLI_LANG") != "" {
+		book.Lang = os.Getenv("KAF_CLI_LANG")
 	}
-
-	if out == "" {
-		out = bookname
-	}
-
-	if l := os.Getenv("KAF-CLI-LANG"); l != "" {
-		lang = l
-	}
-	lang = parseLang(lang)
-
-	if exists, _ := isExists(cover); !exists {
-		cover = ""
-	}
-
-	fmt.Println("转换信息:")
-	fmt.Println("文件名:", filename)
-	fmt.Println("书名:", bookname)
-	if author != "" {
-		fmt.Println("作者:", author)
-	}
-	if cover != "" {
-		fmt.Println("封面:", cover)
-	}
-	fmt.Println("匹配条件:", match)
-	fmt.Println("书籍语言:", lang)
-	fmt.Println()
-
-	// 编译正则表达式
-	if match == "" || match == DefaultMatchTips {
-		match = "^.{0,8}(第.{1,20}(章|节)|(S|s)ection.{1,20}|(C|c)hapter.{1,20}|(P|p)age.{1,20})|^\\d{1,4}.{0,20}$|^引子|^楔子|^章节目录"
-	}
-	var err error
-	reg, err = regexp.Compile(match)
-	if err != nil {
-		fmt.Printf("生成匹配规则出错: %s\n%s\n", match, err.Error())
-		return
-	}
-
+	return &book, nil
 }
 
-func readBuffer(filename string) *bufio.Reader {
+func NewBookArgs() *Book {
+	lang := os.Getenv("KAF_CLI_LANG")
+	var book Book
+	flag.StringVar(&book.Filename, "filename", "", "txt 文件名")
+	flag.StringVar(&book.Author, "author", "YSTYLE", "作者")
+	flag.StringVar(&book.Bookname, "bookname", "", "书名: 默认为txt文件名")
+	flag.UintVar(&book.Max, "max", 35, "标题最大字数")
+	flag.StringVar(&book.Match, "match", "", "匹配标题的正则表达式, 不写可以自动识别, 如果没生成章节就参考教程。例: -match 第.{1,8}章 表示第和章字之间可以有1-8个任意文字")
+	flag.UintVar(&book.Indent, "indent", 2, "段落缩进字数")
+	flag.StringVar(&book.Align, "align", "center", "标题对齐方式: left、center、righ")
+	flag.StringVar(&book.Cover, "cover", "cover.png", "封面图片")
+	flag.StringVar(&book.Bottom, "bottom", "1em", "段落间距(单位可以为em、px)")
+	flag.StringVar(&book.Format, "format", "all", "书籍格式: all、epub、mobi、azw3")
+	flag.StringVar(&book.Lang, "lang", lang, "设置语言: en,de,fr,it,es,zh,ja,pt,ru,nl。 环境变量KAF_CLI_LANG可修改默认值")
+	flag.BoolVar(&book.Tips, "tips", true, "添加本软件教程")
+	flag.StringVar(&book.Out, "out", "", "输出文件名，不需要包含格式后缀")
+	flag.Parse()
+	return &book
+}
+
+func (book *Book) Check() error {
+	if book.Filename == "" {
+		fmt.Println("错误: 文件名不能为空")
+		fmt.Println("简洁模式: \t把文件拖放到kaf-cli上")
+		fmt.Println("命令行简单模式: kaf-cli ebook.txt")
+		fmt.Println("\n以下为kaf-cli的全部参数")
+		flag.PrintDefaults()
+		if runtime.GOOS == "windows" {
+			time.Sleep(time.Second * 10)
+		}
+		os.Exit(0)
+	}
+	reg, _ := regexp.Compile(`《(.*)》（.*）作者：(.*).txt`)
+	if reg.MatchString(book.Filename) {
+		group := reg.FindAllStringSubmatch(book.Filename, -1)
+		if len(group) == 1 && len(group[0]) >= 3 {
+			book.Bookname = group[0][1]
+			book.Author = group[0][2]
+		}
+	}
+	if book.Out == "" {
+		book.Out = book.Bookname
+	}
+	book.Lang = parseLang(book.Lang)
+	if exists, _ := isExists(book.Cover); !exists {
+		book.Cover = ""
+	}
+
+	// 编译正则表达式
+	if book.Match == "" {
+		book.Match = DefaultMatchTips
+	}
+	reg, err := regexp.Compile(book.Match)
+	if err != nil {
+		return fmt.Errorf("生成匹配规则出错: %s\n%s\n", book.Match, err.Error())
+	}
+	book.Reg = reg
+	return nil
+}
+
+func (book *Book) readBuffer(filename string) *bufio.Reader {
 	f, err := os.Open(filename)
 	if err != nil {
 		fmt.Println("读取文件出错: ", err.Error())
@@ -173,11 +177,11 @@ func readBuffer(filename string) *bufio.Reader {
 			os.Exit(1)
 		}
 		var buf bytes.Buffer
-		decoder = encodig.NewDecoder()
+		book.Decoder = encodig.NewDecoder()
 		if encodename == "windows-1252" {
-			decoder = simplifiedchinese.GB18030.NewDecoder()
+			book.Decoder = simplifiedchinese.GB18030.NewDecoder()
 		}
-		bs, _, _ = transform.Bytes(decoder, bs)
+		bs, _, _ = transform.Bytes(book.Decoder, bs)
 		buf.Write(bs)
 		return bufio.NewReader(&buf)
 	} else {
@@ -187,11 +191,29 @@ func readBuffer(filename string) *bufio.Reader {
 	}
 }
 
-func parseBook() []Section {
+func (book Book) ToString() {
+	fmt.Println("转换信息:")
+	fmt.Println("文件名:\t", book.Filename)
+	fmt.Println("书籍书名:", book.Bookname)
+	fmt.Println("书籍作者:", book.Author)
+	if book.Cover != "" {
+		fmt.Println("书籍封面:", book.Cover)
+	}
+	fmt.Println("书籍语言:", book.Lang)
+	if book.Match == DefaultMatchTips {
+		fmt.Println("匹配条件:", "自动匹配")
+	} else {
+		fmt.Println("匹配条件:", book.Match)
+	}
+	fmt.Println("转换格式:", book.Format)
+	fmt.Println()
+}
+
+func (book *Book) Parse() error {
 	var contentList []Section
 	fmt.Println("正在读取txt文件...")
 	start := time.Now()
-	buf := readBuffer(filename)
+	buf := book.readBuffer(book.Filename)
 	var title string
 	var content bytes.Buffer
 	for {
@@ -210,8 +232,7 @@ func parseBook() []Section {
 				content.Reset()
 				break
 			}
-			fmt.Println("读取文件出错:", err.Error())
-			os.Exit(1)
+			return fmt.Errorf("读取文件出错: %w", err)
 		}
 		line = strings.TrimSpace(line)
 		line = strings.ReplaceAll(line, "<", "&lt;")
@@ -221,10 +242,10 @@ func parseBook() []Section {
 			continue
 		}
 		// 处理标题
-		if utf8.RuneCountInString(line) <= int(max) && reg.MatchString(line) {
+		if utf8.RuneCountInString(line) <= int(book.Max) && book.Reg.MatchString(line) {
 			if title == "" {
 				title = "说明"
-				if Tips {
+				if book.Tips {
 					addPart(&content, Tutorial)
 				}
 			}
@@ -253,26 +274,26 @@ func parseBook() []Section {
 	}
 	end := time.Now().Sub(start)
 	fmt.Println("读取文件耗时:", end)
-
+	fmt.Println("匹配章节:", len(contentList))
 	// 添加提示
-	if Tips {
+	if book.Tips {
 		contentList = append(contentList, Section{
 			Title:   "制作说明",
 			Content: Tutorial,
 		})
 	}
-	return contentList
+	book.SectionList = contentList
+	return nil
 }
 
-func Convert() {
+func (book *Book) Convert() {
 	start := time.Now()
 	// 解析文本
-	sectionList := parseBook()
 	fmt.Println()
 
 	// 判断要生成的格式
 	var isEpub, isMobi, isAzw3 bool
-	switch format {
+	switch book.Format {
 	case "epub":
 		isEpub = true
 	case "mobi":
@@ -290,138 +311,31 @@ func Convert() {
 	if isMobi && hasKinldegen == "" {
 		isEpub = false
 	}
+
+	var convert Converter
 	// 生成epub
 	if isEpub {
-		buildEpub(sectionList)
+		convert = EpubConverter{}
+		convert.Build(*book)
 		fmt.Println()
 	}
 	// 生成azw3格式
 	if isAzw3 {
+		convert = Azw3Converter{}
 		// 生成kindle格式
-		buildAzw3(sectionList)
+		convert.Build(*book)
 	}
 	// 生成mobi格式
 	if isMobi {
-		if hasKinldegen != "" {
-			converToMobi(fmt.Sprintf("%s.epub", out))
+		if hasKinldegen == "" {
+			convert = MobiConverter{}
+			convert.Build(*book)
+		} else {
+			converToMobi(fmt.Sprintf("%s.epub", book.Out), book.Lang)
 		}
 	}
 	end := time.Now().Sub(start)
 	fmt.Println("\n转换完成! 总耗时:", end)
-}
-
-func wrapMobiTitle(title, content string) string {
-	var buff bytes.Buffer
-	buff.WriteString(fmt.Sprintf(mobiTtmlTitleStart, align))
-	buff.WriteString(title)
-	buff.WriteString(htmlTitleEnd)
-	buff.WriteString(content)
-	return buff.String()
-}
-
-func buildAzw3(sectionList []Section) {
-	fmt.Println("使用第三方库生成azw3, 不保证所有样式都能正常显示")
-	fmt.Println("正在生成azw3...")
-	start := time.Now()
-	mb := mobi.Book{
-		Title:       bookname,
-		Authors:     []string{author},
-		CreatedDate: time.Now(),
-		Chapters:    []mobi.Chapter{},
-		Language:    language.MustParse(lang),
-		UniqueID:    rand.Uint32(),
-	}
-	css := fmt.Sprintf(cssContent, align, bottom, indent)
-	for _, section := range sectionList {
-		ch := mobi.Chapter{
-			Title:  section.Title,
-			Chunks: mobi.Chunks(wrapMobiTitle(section.Title, section.Content)),
-		}
-		mb.Chapters = append(mb.Chapters, ch)
-	}
-
-	mb.CSSFlows = []string{css}
-	if cover != "" {
-		f, err := os.Open(cover)
-		if err != nil {
-			panic(err)
-		}
-		img, _, err := image.Decode(f)
-		if err != nil {
-			panic(err)
-		}
-		mb.CoverImage = img
-	}
-
-	// Convert book to PalmDB database
-	db := mb.Realize()
-
-	// Write database to file
-	f, _ := os.Create(fmt.Sprintf("%s.azw3", out))
-	err := db.Write(f)
-	if err != nil {
-		panic(err)
-	}
-	fmt.Println("生成azw3电子书耗时:", time.Now().Sub(start))
-}
-
-func wrapEpubTitle(title, content string) string {
-	var buff bytes.Buffer
-	buff.WriteString(htmlTitleStart)
-	buff.WriteString(title)
-	buff.WriteString(htmlTitleEnd)
-	buff.WriteString(content)
-	return buff.String()
-}
-
-func buildEpub(sectionList []Section) {
-	fmt.Println("正在生成epub")
-	start := time.Now()
-	// 写入样式
-	tempDir, err := ioutil.TempDir("", "kaf-cli")
-	defer func() {
-		if err := os.RemoveAll(tempDir); err != nil {
-			panic(fmt.Sprintf("创建临时文件夹失败: %s", err))
-		}
-	}()
-	pageStylesFile = path.Join(tempDir, "page_styles.css")
-
-	err = ioutil.WriteFile(pageStylesFile, []byte(fmt.Sprintf(cssContent, align, bottom, indent)), 0666)
-	if err != nil {
-		panic(fmt.Sprintf("无法写入样式文件: %s", err))
-	}
-	// Create a ne EPUB
-	e := epub.NewEpub(bookname)
-	e.SetLang(lang)
-	// Set the author
-	e.SetAuthor(author)
-	css, err := e.AddCSS(pageStylesFile, "")
-	if err != nil {
-		panic(fmt.Sprintf("无法写入样式文件: %s", err))
-	}
-
-	if cover != "" {
-		img, err := e.AddImage(cover, cover)
-		if err != nil {
-			panic(err)
-		}
-		e.SetCover(img, "")
-	}
-
-	for _, section := range sectionList {
-		e.AddSection(wrapEpubTitle(section.Title, section.Content), section.Title, "", css)
-	}
-
-	// Write the EPUB
-	fmt.Println("正在生成电子书...")
-	epubName := out + ".epub"
-	err = e.Write(epubName)
-	if err != nil {
-		// handle error
-	}
-	// 计算耗时
-	end := time.Now().Sub(start)
-	fmt.Println("生成EPUB电子书耗时:", end)
 }
 
 func addPart(buff *bytes.Buffer, content string) {

@@ -1,3 +1,5 @@
+github.com/766b/mobi v0.0.0-20200528201125-c87aa9e3c890 h1:5EBpQM2h7OdIRR1jw1IypiKzbYo/8Hx5/iRxgqPSKFI=
+github.com/766b/mobi v0.0.0-20200528201125-c87aa9e3c890/go.mod h1:ut/OVrYa64AAfis3e0GO4uEb8mwXSJoqAqnIMQd24HQ=
 github.com/bmaupin/go-epub v0.5.3 h1:HBOJS2KqsRGGcEzM470/9l5q2l9JwAUxQabEgPMrW90=
 github.com/bmaupin/go-epub v0.5.3/go.mod h1:4RBr0Zo03mRGOyGAcc25eLOqIPCkMbfz+tINVmH6clQ=
 github.com/gofrs/uuid v3.1.0+incompatible h1:q2rtkjaKT4YEr6E1kamy0Ha4RtepWlQBedyHx0uzKwA=

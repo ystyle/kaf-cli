@@ -13,6 +13,9 @@ import (
 )
 
 func parseLang(lang string) string {
+	if lang == "" {
+		return "en"
+	}
 	var langs = "en,de,fr,it,es,zh,ja,pt,ru,nl"
 	if strings.Contains(langs, lang) {
 		return lang
@@ -42,7 +45,7 @@ func lookKindlegen() string {
 	return kindlegen
 }
 
-func converToMobi(bookname string) {
+func converToMobi(bookname, lang string) {
 	command := lookKindlegen()
 	fmt.Printf("\n检测到Kindle格式转换器: %s，正在把书籍转换成Kindle格式...\n", command)
 	fmt.Println("转换mobi比较花时间, 大约耗时1-10分钟, 请等待...")
