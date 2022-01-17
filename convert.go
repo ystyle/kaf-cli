@@ -15,6 +15,7 @@ import (
 	"io"
 	"io/ioutil"
 	"os"
+	"path/filepath"
 	"regexp"
 	"runtime"
 	"strings"
@@ -40,6 +41,7 @@ type Book struct {
 	Decoder        *encoding.Decoder
 	PageStylesFile string
 	Reg            *regexp.Regexp
+	version        string
 }
 
 type Section struct {
@@ -72,9 +74,6 @@ const (
 )
 
 func NewBookSimple(filename string) (*Book, error) {
-	if !strings.HasSuffix(filename, ".txt") {
-		return nil, errors.New("不是txt文件")
-	}
 	book := Book{
 		Filename:       filename,
 		Bookname:       "",
@@ -120,9 +119,14 @@ func NewBookArgs() *Book {
 	return &book
 }
 
-func (book *Book) Check() error {
+func (book *Book) Check(version string) error {
+	book.version = version
+	if !strings.HasSuffix(book.Filename, ".txt") {
+		return errors.New("不是txt文件")
+	}
 	if book.Filename == "" {
 		fmt.Println("错误: 文件名不能为空")
+		fmt.Println("软件版本: \t", version)
 		fmt.Println("简洁模式: \t把文件拖放到kaf-cli上")
 		fmt.Println("命令行简单模式: kaf-cli ebook.txt")
 		fmt.Println("\n以下为kaf-cli的全部参数")
@@ -132,13 +136,21 @@ func (book *Book) Check() error {
 		}
 		os.Exit(0)
 	}
-	reg, _ := regexp.Compile(`《(.*)》（.*）作者：(.*).txt`)
+	// 通过文件名解析书名
+	reg, _ := regexp.Compile(`《(.*)》.*作者：(.*).txt`)
 	if reg.MatchString(book.Filename) {
 		group := reg.FindAllStringSubmatch(book.Filename, -1)
 		if len(group) == 1 && len(group[0]) >= 3 {
-			book.Bookname = group[0][1]
-			book.Author = group[0][2]
+			if book.Bookname == "" {
+				book.Bookname = group[0][1]
+			}
+			if book.Author == "" || book.Author == "YSTYLE" {
+				book.Author = group[0][2]
+			}
 		}
+	}
+	if book.Bookname == "" {
+		book.Bookname = strings.Split(filepath.Base(book.Filename), ".")[0]
 	}
 	if book.Out == "" {
 		book.Out = book.Bookname
@@ -147,7 +159,6 @@ func (book *Book) Check() error {
 	if exists, _ := isExists(book.Cover); !exists {
 		book.Cover = ""
 	}
-
 	// 编译正则表达式
 	if book.Match == "" {
 		book.Match = DefaultMatchTips
@@ -193,6 +204,7 @@ func (book *Book) readBuffer(filename string) *bufio.Reader {
 
 func (book Book) ToString() {
 	fmt.Println("转换信息:")
+	fmt.Println("软件版本:", book.version)
 	fmt.Println("文件名:\t", book.Filename)
 	fmt.Println("书籍书名:", book.Bookname)
 	fmt.Println("书籍作者:", book.Author)

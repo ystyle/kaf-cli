@@ -1,6 +1,7 @@
 package main
 
 import (
+	"fmt"
 	"github.com/ystyle/kaf-cli"
 	"os"
 	"strings"
@@ -18,17 +19,20 @@ func main() {
 	if len(os.Args) == 2 && strings.HasSuffix(os.Args[1], ".txt") {
 		book, err = kafcli.NewBookSimple(os.Args[1])
 		if err != nil {
-			panic(err)
+			fmt.Printf("错误: %s\n", err.Error())
+			os.Exit(3)
 		}
 	} else {
 		book = kafcli.NewBookArgs()
 	}
-	if err := book.Check(); err != nil {
-		panic(err)
+	if err := book.Check(version); err != nil {
+		fmt.Printf("错误: %s\n", err.Error())
+		os.Exit(1)
 	}
 	book.ToString()
 	if err := book.Parse(); err != nil {
-		panic(err)
+		fmt.Printf("错误: %s\n", err.Error())
+		os.Exit(2)
 	}
 	book.Convert()
 	kafcli.Analytics(version, secret, measurement)
