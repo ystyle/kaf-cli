@@ -17,7 +17,7 @@ func (convert Azw3Converter) Build(book Book) error {
 	fmt.Println("使用第三方库生成azw3, 不保证所有样式都能正常显示")
 	fmt.Println("正在生成azw3...")
 	start := time.Now()
-	chunks := SectionSliceChunk(book.SectionList, 2000)
+	chunks := SectionSliceChunk(book.SectionList, 2700)
 	for i, chunk := range chunks {
 		index := i + 1
 		title := fmt.Sprintf("%s_%d", book.Bookname, index)
