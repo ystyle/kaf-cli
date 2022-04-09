@@ -17,7 +17,7 @@ func (convert Azw3Converter) Build(book Book) error {
 	fmt.Println("使用第三方库生成azw3, 不保证所有样式都能正常显示")
 	fmt.Println("正在生成azw3...")
 	start := time.Now()
-	chunks := SectionSliceChunk(book.SectionList, 2700)
+	chunks := SectionSliceChunk(book.SectionList, 2000)
 	for i, chunk := range chunks {
 		index := i + 1
 		title := fmt.Sprintf("%s_%d", book.Bookname, index)
@@ -38,7 +38,7 @@ func (convert Azw3Converter) Build(book Book) error {
 		for _, section := range chunk {
 			ch := mobi.Chapter{
 				Title:  section.Title,
-				Chunks: mobi.Chunks(convert.wrapMobiTitle(section.Title, section.Content, book.Align)),
+				Chunks: mobi.Chunks(convert.wrapTitle(section.Title, section.Content, book.Align)),
 			}
 			mb.Chapters = append(mb.Chapters, ch)
 		}
@@ -71,7 +71,7 @@ func (convert Azw3Converter) Build(book Book) error {
 	return nil
 }
 
-func (convert Azw3Converter) wrapMobiTitle(title, content, align string) string {
+func (convert Azw3Converter) wrapTitle(title, content, align string) string {
 	var buff bytes.Buffer
 	buff.WriteString(fmt.Sprintf(mobiTtmlTitleStart, align))
 	buff.WriteString(title)

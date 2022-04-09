@@ -7,7 +7,6 @@ import (
 	"os"
 	"os/exec"
 	"path"
-	"runtime"
 	"strings"
 	"time"
 )
@@ -31,15 +30,15 @@ func run(command string, args ...string) error {
 
 func lookKindlegen() string {
 	command := "kindlegen"
-	if runtime.GOOS == "windows" {
-		command = "kindlegen.exe"
-	}
-	kindlegen, _ := exec.LookPath(command)
-	if kindlegen == "" {
-		currentDir := path.Dir(os.Args[0])
-		kindlegen = path.Join(currentDir, command)
+	kindlegen, err := exec.LookPath(command)
+	if err != nil {
+		currentDir, err := os.Executable()
+		if err != nil {
+			return ""
+		}
+		kindlegen = path.Join(path.Dir(currentDir), command)
 		if exist, _ := isExists(kindlegen); !exist {
-			return kindlegen
+			return ""
 		}
 	}
 	return kindlegen

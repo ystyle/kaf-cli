@@ -12,7 +12,7 @@ import (
 
 type EpubConverter struct{}
 
-func (convert EpubConverter) wrapEpubTitle(title, content string) string {
+func (convert EpubConverter) wrapTitle(title, content string) string {
 	var buff bytes.Buffer
 	buff.WriteString(htmlTitleStart)
 	buff.WriteString(title)
@@ -56,7 +56,7 @@ func (convert EpubConverter) Build(book Book) error {
 	}
 
 	for _, section := range book.SectionList {
-		e.AddSection(convert.wrapEpubTitle(section.Title, section.Content), section.Title, "", css)
+		e.AddSection(convert.wrapTitle(section.Title, section.Content), section.Title, "", css)
 	}
 
 	// Write the EPUB

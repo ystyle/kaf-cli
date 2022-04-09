@@ -29,11 +29,11 @@ func main() {
 		fmt.Printf("错误: %s\n", err.Error())
 		os.Exit(1)
 	}
+	kafcli.Analytics(version, secret, measurement, book.Format)
 	book.ToString()
 	if err := book.Parse(); err != nil {
 		fmt.Printf("错误: %s\n", err.Error())
 		os.Exit(2)
 	}
 	book.Convert()
-	kafcli.Analytics(version, secret, measurement)
 }

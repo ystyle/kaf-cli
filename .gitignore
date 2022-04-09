@@ -4,4 +4,6 @@
 *.txt
 *.exe
 *.tmp
+*.zio
 kaf-cli-*
+samples

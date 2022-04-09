@@ -8,7 +8,7 @@ import (
 	"time"
 )
 
-func Analytics(version, secret, measurement string) {
+func Analytics(version, secret, measurement, format string) {
 	if secret == "" || measurement == "" {
 		return
 	}
@@ -23,6 +23,7 @@ func Analytics(version, secret, measurement string) {
 				Params: map[string]interface{}{
 					"os":      runtime.GOOS,
 					"arch":    runtime.GOARCH,
+					"format":  format,
 					"version": version,
 				},
 			},
