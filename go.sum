@@ -8,8 +8,8 @@ github.com/gofrs/uuid v3.1.0+incompatible h1:q2rtkjaKT4YEr6E1kamy0Ha4RtepWlQBedy
 github.com/gofrs/uuid v3.1.0+incompatible/go.mod h1:b2aQJv3Z4Fp6yNu3cdSllBxTCLRxnplIgP/c0N/04lM=
 github.com/golang/text v0.3.2 h1:vDAeTQXl8YUdGoj2vMsMnzHi1xMJJ9S7iwnTBFL/pkA=
 github.com/golang/text v0.3.2/go.mod h1:bEr9sfX3Q8Zfm5fL9x+3itogRgK3+ptLWKqgva+5dAk=
-github.com/leotaku/mobi v0.0.0-20220207093106-57a02a608c69 h1:dv945mB0CESmWHYQAhTDh2yR5dYSOVhn6FMFdApJ0Ss=
-github.com/leotaku/mobi v0.0.0-20220207093106-57a02a608c69/go.mod h1:aPjSURhp6tj0b/dLHyjzeygcitkmvO2/SO368XiPtrs=
+github.com/leotaku/mobi v0.0.0-20220405163106-82e29bde7964 h1:h7CxQNRMxzHmVvDV1TPudN9XUF0YxYnh966lQ3kqEoo=
+github.com/leotaku/mobi v0.0.0-20220405163106-82e29bde7964/go.mod h1:aPjSURhp6tj0b/dLHyjzeygcitkmvO2/SO368XiPtrs=
 github.com/vincent-petithory/dataurl v0.0.0-20191104211930-d1553a71de50 h1:uxE3GYdXIOfhMv3unJKETJEhw78gvzuQqRX/rVirc2A=
 github.com/vincent-petithory/dataurl v0.0.0-20191104211930-d1553a71de50/go.mod h1:FHafX5vmDzyP+1CQATJn7WFKc9CvnvxyvZy6I1MrG/U=
 github.com/ystyle/google-analytics v0.0.0-20210425064301-a7f754dd0649 h1:2uiow2Fw91jCIiYwMKvPF/lUMMdtVjgVpwqTcbC0fPU=
