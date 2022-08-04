@@ -2,6 +2,7 @@ package kafcli
 
 import (
 	"fmt"
+	"golang.org/x/sys/execabs"
 	"io/ioutil"
 	"math/rand"
 	"os"
@@ -30,7 +31,7 @@ func run(command string, args ...string) error {
 
 func lookKindlegen() string {
 	command := "kindlegen"
-	kindlegen, err := exec.LookPath(command)
+	kindlegen, err := execabs.LookPath(command)
 	if err != nil {
 		currentDir, err := os.Executable()
 		if err != nil {

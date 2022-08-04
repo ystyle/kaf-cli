@@ -14,7 +14,7 @@ jobs:
       - name: Set up Go 1.x
         uses: actions/setup-go@v2
         with:
-          go-version: ^1.18
+          go-version: ^1.19
         id: go
 
       - name: Check out code into the Go module directory
@@ -33,23 +33,25 @@ jobs:
           version=`git describe --tags $hash`
           flag="-s -w -X main.secret=${{ secrets.API_SECRET }} -X main.measurement=${{ secrets.MEASUREMENT }} -X main.version=$version"
           go mod tidy
-          GOOS=windows GOARCH=amd64 go build -ldflags "$flag" -o build/windows-amd64/kaf-cli.exe cmd/cli.go
-          GOOS=windows GOARCH=386   go build -ldflags "$flag" -o build/windows-386/kaf-cli.exe   cmd/cli.go
-          GOOS=linux   GOARCH=amd64 go build -ldflags "$flag" -o build/linux-amd64/kaf-cli cmd/cli.go
-          GOOS=linux   GOARCH=arm64 go build -ldflags "$flag" -o build/linux-arm64/kaf-cli cmd/cli.go
-          GOOS=darwin  GOARCH=amd64 go build -ldflags "$flag" -o build/darwin-amd64/kaf-cli cmd/cli.go
-          GOOS=darwin  GOARCH=arm64 go build -ldflags "$flag" -o build/darwin-arm64/kaf-cli cmd/cli.go
+          GOOS=windows GOARCH=amd64   go build -ldflags "$flag" -o build/windows-amd64/kaf-cli.exe cmd/cli.go
+          GOOS=windows GOARCH=386     go build -ldflags "$flag" -o build/windows-386/kaf-cli.exe   cmd/cli.go
+          GOOS=linux   GOARCH=amd64   go build -ldflags "$flag" -o build/linux-amd64/kaf-cli       cmd/cli.go
+          GOOS=linux   GOARCH=arm64   go build -ldflags "$flag" -o build/linux-arm64/kaf-cli       cmd/cli.go
+          GOOS=linux   GOARCH=loong64 go build -ldflags "$flag" -o build/linux-loong64/kaf-cli     cmd/cli.go
+          GOOS=darwin  GOARCH=amd64   go build -ldflags "$flag" -o build/darwin-amd64/kaf-cli      cmd/cli.go
+          GOOS=darwin  GOARCH=arm64   go build -ldflags "$flag" -o build/darwin-arm64/kaf-cli      cmd/cli.go
 
       - name: compression zip
         run: |
           hash=`git rev-list --tags --max-count=1`
           version=`git describe --tags $hash`
           zip -j kaf-cli_${version}_windows_amd64.zip build/windows-amd64/kaf-cli.exe windows/kindlegen.exe
-          zip -j kaf-cli_${version}_windows_386.zip build/windows-386/kaf-cli.exe windows/kindlegen.exe
-          zip -j kaf-cli_${version}_darwin_amd64.zip build/darwin-amd64/kaf-cli darwin/kindlegen
-          zip -j kaf-cli_${version}_darwin_arm64.zip build/darwin-arm64/kaf-cli darwin/kindlegen
-          zip -j kaf-cli_${version}_linux_amd64.zip build/linux-amd64/kaf-cli
-          zip -j kaf-cli_${version}_linux_arm64.zip build/linux-arm64/kaf-cli
+          zip -j kaf-cli_${version}_windows_386.zip   build/windows-386/kaf-cli.exe windows/kindlegen.exe
+          zip -j kaf-cli_${version}_darwin_amd64.zip  build/darwin-amd64/kaf-cli darwin/kindlegen
+          zip -j kaf-cli_${version}_darwin_arm64.zip  build/darwin-arm64/kaf-cli darwin/kindlegen
+          zip -j kaf-cli_${version}_linux_amd64.zip   build/linux-amd64/kaf-cli
+          zip -j kaf-cli_${version}_linux_arm64.zip   build/linux-arm64/kaf-cli
+          zip -j kaf-cli_${version}_linux_loong64.zip build/linux-loong64/kaf-cli
 
       - name: Upload release binaries
         uses: alexellis/upload-assets@0.2.2
