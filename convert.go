@@ -320,7 +320,7 @@ func (book *Book) Convert() {
 	}
 
 	hasKinldegen := lookKindlegen()
-	if isMobi && hasKinldegen == "" {
+	if book.Format == "mobi" && hasKinldegen == "" {
 		isEpub = false
 	}
 
