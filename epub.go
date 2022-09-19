@@ -4,9 +4,8 @@ import (
 	"bytes"
 	"fmt"
 	"github.com/bmaupin/go-epub"
-	"io/ioutil"
 	"os"
-	"path"
+	"path/filepath"
 	"time"
 )
 
@@ -25,15 +24,15 @@ func (convert EpubConverter) Build(book Book) error {
 	fmt.Println("正在生成epub")
 	start := time.Now()
 	// 写入样式
-	tempDir, err := ioutil.TempDir("", "kaf-cli")
+	tempDir, err := os.MkdirTemp("", "kaf-cli")
 	defer func() {
 		if err := os.RemoveAll(tempDir); err != nil {
 			panic(fmt.Sprintf("创建临时文件夹失败: %s", err))
 		}
 	}()
-	pageStylesFile := path.Join(tempDir, "page_styles.css")
+	pageStylesFile := filepath.Join(tempDir, "page_styles.css")
 
-	err = ioutil.WriteFile(pageStylesFile, []byte(fmt.Sprintf(cssContent, book.Align, book.Bottom, book.Indent)), 0666)
+	err = os.WriteFile(pageStylesFile, []byte(fmt.Sprintf(cssContent, book.Align, book.Bottom, book.Indent)), 0666)
 	if err != nil {
 		return fmt.Errorf("无法写入样式文件: %w", err)
 	}
