@@ -47,7 +47,7 @@ func (convert EpubConverter) Build(book Book) error {
 	}
 
 	if book.Cover != "" {
-		img, err := e.AddImage(book.Cover, book.Cover)
+		img, err := e.AddImage(book.Cover, filepath.Base(book.Cover))
 		if err != nil {
 			return fmt.Errorf("添加封面失败: %w", err)
 		}
