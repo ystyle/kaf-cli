@@ -41,6 +41,7 @@ type Book struct {
 	Decoder        *encoding.Decoder
 	PageStylesFile string
 	Reg            *regexp.Regexp
+	Reg2           *regexp.Regexp
 	version        string
 }
 
@@ -59,6 +60,7 @@ const (
 	htmlTitleStart     = `<h3 class="title">`
 	mobiTtmlTitleStart = `<h3 style="text-align:%s;">`
 	htmlTitleEnd       = "</h3>"
+	Match              = "^第[0-9一二三四五六七八九十零〇百千两 ]+卷"
 	DefaultMatchTips   = "^第[0-9一二三四五六七八九十零〇百千两 ]+[章回节集卷]|^[Ss]ection.{1,20}$|^[Cc]hapter.{1,20}$|^[Pp]age.{1,20}$|^\\d{1,4}$|^引子$|^楔子$|^章节目录|^章节|^序章"
 	cssContent         = `
 .title {text-align:%s}
@@ -168,6 +170,8 @@ func (book *Book) Check(version string) error {
 		return fmt.Errorf("生成匹配规则出错: %s\n%s\n", book.Match, err.Error())
 	}
 	book.Reg = reg
+	reg2, _ := regexp.Compile(Match)
+	book.Reg2 = reg2
 	return nil
 }
 
@@ -260,9 +264,6 @@ func (book *Book) Parse() error {
 				if book.Tips {
 					addPart(&content, Tutorial)
 				}
-			}
-			if content.Len() == 0 {
-				continue
 			}
 			contentList = append(contentList, Section{
 				Title:   title,
