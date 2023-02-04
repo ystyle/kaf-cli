@@ -83,13 +83,13 @@ func NewBookSimple(filename string) (*Book, error) {
 		Author:         "YSTYLE",
 		Max:            35,
 		Indent:         2,
-		Align:          "center",
+		Align:          GetEnv("KAF_CLI_ALIGN", "center"),
 		Cover:          "cover.png",
 		Bottom:         "1em",
 		Tips:           true,
-		Lang:           "zh",
+		Lang:           GetEnv("KAF_CLI_LANG", "zh"),
 		Out:            "",
-		Format:         "all",
+		Format:         GetEnv("KAF_CLI_FORMAT", "all"),
 		SectionList:    nil,
 		Decoder:        nil,
 		PageStylesFile: "",
@@ -102,7 +102,6 @@ func NewBookSimple(filename string) (*Book, error) {
 }
 
 func NewBookArgs() *Book {
-	lang := os.Getenv("KAF_CLI_LANG")
 	var book Book
 	flag.StringVar(&book.Filename, "filename", "", "txt 文件名")
 	flag.StringVar(&book.Author, "author", "YSTYLE", "作者")
@@ -110,11 +109,11 @@ func NewBookArgs() *Book {
 	flag.UintVar(&book.Max, "max", 35, "标题最大字数")
 	flag.StringVar(&book.Match, "match", "", "匹配标题的正则表达式, 不写可以自动识别, 如果没生成章节就参考教程。例: -match 第.{1,8}章 表示第和章字之间可以有1-8个任意文字")
 	flag.UintVar(&book.Indent, "indent", 2, "段落缩进字数")
-	flag.StringVar(&book.Align, "align", "center", "标题对齐方式: left、center、righ")
+	flag.StringVar(&book.Align, "align", GetEnv("KAF_CLI_ALIGN", "center"), "标题对齐方式: left、center、righ。环境变量KAF_CLI_ALIGN可修改默认值")
 	flag.StringVar(&book.Cover, "cover", "cover.png", "封面图片")
 	flag.StringVar(&book.Bottom, "bottom", "1em", "段落间距(单位可以为em、px)")
-	flag.StringVar(&book.Format, "format", "all", "书籍格式: all、epub、mobi、azw3")
-	flag.StringVar(&book.Lang, "lang", lang, "设置语言: en,de,fr,it,es,zh,ja,pt,ru,nl。 环境变量KAF_CLI_LANG可修改默认值")
+	flag.StringVar(&book.Format, "format", GetEnv("KAF_CLI_FORMAT", "all"), "书籍格式: all、epub、mobi、azw3。环境变量KAF_CLI_FORMAT可修改默认值")
+	flag.StringVar(&book.Lang, "lang", GetEnv("KAF_CLI_LANG", "zh"), "设置语言: en,de,fr,it,es,zh,ja,pt,ru,nl。环境变量KAF_CLI_LANG可修改默认值")
 	flag.BoolVar(&book.Tips, "tips", true, "添加本软件教程")
 	flag.StringVar(&book.Out, "out", "", "输出文件名，不需要包含格式后缀")
 	flag.Parse()
