@@ -232,6 +232,12 @@ func (book *Book) Parse() error {
 	buf := book.readBuffer(book.Filename)
 	var title string
 	var content bytes.Buffer
+	if book.Tips {
+		contentList = append(contentList, Section{
+			Title:   "说明",
+			Content: Tutorial,
+		})
+	}
 	for {
 		line, err := buf.ReadString('\n')
 		if err != nil {
@@ -260,15 +266,14 @@ func (book *Book) Parse() error {
 		// 处理标题
 		if utf8.RuneCountInString(line) <= int(book.Max) && book.Reg.MatchString(line) {
 			if title == "" {
-				title = "说明"
-				if book.Tips {
-					addPart(&content, Tutorial)
-				}
+				title = "章节正文"
 			}
-			contentList = append(contentList, Section{
-				Title:   title,
-				Content: content.String(),
-			})
+			if content.Len() > 0 {
+				contentList = append(contentList, Section{
+					Title:   title,
+					Content: content.String(),
+				})
+			}
 			title = line
 			content.Reset()
 			continue
