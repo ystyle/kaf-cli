@@ -36,8 +36,6 @@ jobs:
           export GOBIN=/home/runner/go_bin
           go get github.com/akavel/rsrc
           go install github.com/akavel/rsrc
-          ls -al
-          ls -al /home/runner/go_bin
           go mod tidy
           GOOS=linux   GOARCH=amd64   go build -ldflags "$flag" -o build/linux-amd64/kaf-cli       cmd/cli.go
           GOOS=linux   GOARCH=arm64   go build -ldflags "$flag" -o build/linux-arm64/kaf-cli       cmd/cli.go
