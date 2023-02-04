@@ -32,6 +32,8 @@ jobs:
           hash=`git rev-list --tags --max-count=1`
           version=`git describe --tags $hash`
           flag="-s -w -X main.secret=${{ secrets.API_SECRET }} -X main.measurement=${{ secrets.MEASUREMENT }} -X main.version=$version"
+          mkdir -p /home/runner/go_bin
+          export GOBIN=/home/runner/go_bin
           go get github.com/akavel/rsrc
           env
           go mod tidy
@@ -40,7 +42,7 @@ jobs:
           GOOS=linux   GOARCH=loong64 go build -ldflags "$flag" -o build/linux-loong64/kaf-cli     cmd/cli.go
           GOOS=darwin  GOARCH=amd64   go build -ldflags "$flag" -o build/darwin-amd64/kaf-cli      cmd/cli.go
           GOOS=darwin  GOARCH=arm64   go build -ldflags "$flag" -o build/darwin-arm64/kaf-cli      cmd/cli.go
-          /home/runner/go/bin/rsrc -arch amd64 -manifest kaf-cli.exe.manifest -ico ./assets/kaf.ico -o kaf-cli.syso
+          ${GOBIN}/rsrc -arch amd64 -manifest kaf-cli.exe.manifest -ico ./assets/kaf.ico -o kaf-cli.syso
           GOOS=windows GOARCH=386     go build -ldflags "$flag" -o build/windows-386/kaf-cli.exe   cmd/cli.go
           GOOS=windows GOARCH=amd64   go build -ldflags "$flag" -o build/windows-amd64/kaf-cli.exe cmd/cli.go
 
