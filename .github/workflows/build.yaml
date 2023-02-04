@@ -34,6 +34,7 @@ jobs:
           flag="-s -w -X main.secret=${{ secrets.API_SECRET }} -X main.measurement=${{ secrets.MEASUREMENT }} -X main.version=$version"
           mkdir -p /home/runner/go_bin
           export GOBIN=/home/runner/go_bin
+          go get github.com/akavel/rsrc
           go install github.com/akavel/rsrc
           ls -al
           ls -al /home/runner/go_bin
