@@ -24,7 +24,9 @@
 - 手机版kaf: [Github下载](https://github.com/ystyle/kaf-cli/releases/tag/android)
 - 电脑版wifi传书kaf-wifi: [Github下载](https://github.com/ystyle/kaf-wifi/releases/latest)
 - 全部软件 [百度网盘下载 `https://pan.baidu.com/s/1EPkLJ7WIJYdYtRHBEMqw0w?pwd=h4np`](https://pan.baidu.com/s/1EPkLJ7WIJYdYtRHBEMqw0w?pwd=h4np)
-- Archlinux 可以在aur上安装 [`yay -S kaf-cli kaf-wifi`](https://aur.archlinux.org/packages/kaf-cli/)
+- 包管理器安装:
+  - Archlinux 可以在aur上安装 [`yay -S kaf-cli kaf-wifi`](https://aur.archlinux.org/packages/kaf-cli/)
+  - windows使用winget: `winget install kaf-cli`
 
 ### 使用方法
 1. 解压, 把小说直接拖到 `kaf-cli.exe` 文件上面
