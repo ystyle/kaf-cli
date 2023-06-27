@@ -32,7 +32,11 @@ func (convert EpubConverter) Build(book Book) error {
 	}()
 	pageStylesFile := filepath.Join(tempDir, "page_styles.css")
 
-	err = os.WriteFile(pageStylesFile, []byte(fmt.Sprintf(cssContent, book.Align, book.Bottom, book.Indent)), 0666)
+	var excss string
+	if book.LineHeight != "" {
+		excss = fmt.Sprintf("line-height: %s;", book.LineHeight)
+	}
+	err = os.WriteFile(pageStylesFile, []byte(fmt.Sprintf(cssContent, book.Align, book.Bottom, book.Indent, excss)), 0666)
 	if err != nil {
 		return fmt.Errorf("无法写入样式文件: %w", err)
 	}
@@ -55,7 +59,25 @@ func (convert EpubConverter) Build(book Book) error {
 	}
 
 	for _, section := range book.SectionList {
-		e.AddSection(convert.wrapTitle(section.Title, section.Content), section.Title, "", css)
+		if len(section.Sections) > 0 {
+			internalFilename, _ := e.AddSection(
+				convert.wrapTitle(section.Title, section.Content),
+				section.Title,
+				"",
+				css,
+			)
+			for _, subsecton := range section.Sections {
+				e.AddSubSection(
+					internalFilename,
+					convert.wrapTitle(subsecton.Title, subsecton.Content),
+					subsecton.Title,
+					"",
+					css,
+				)
+			}
+		} else {
+			e.AddSection(convert.wrapTitle(section.Title, section.Content), section.Title, "", css)
+		}
 	}
 
 	// Write the EPUB

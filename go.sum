@@ -1,7 +1,7 @@
 github.com/766b/mobi v0.0.0-20200528201125-c87aa9e3c890 h1:5EBpQM2h7OdIRR1jw1IypiKzbYo/8Hx5/iRxgqPSKFI=
 github.com/766b/mobi v0.0.0-20200528201125-c87aa9e3c890/go.mod h1:ut/OVrYa64AAfis3e0GO4uEb8mwXSJoqAqnIMQd24HQ=
-github.com/bmaupin/go-epub v1.0.1 h1:LLbczYCXO/1sGpFd4/QRaDiEhevo4PYQxBQClZPRoco=
-github.com/bmaupin/go-epub v1.0.1/go.mod h1:mBan+0WgVv5JbPNw1xfnfQoTRN9iPMKBshZwPOL0SY0=
+github.com/bmaupin/go-epub v1.1.0 h1:XJyvvjchtUlbZ2P7eaEeB8EFw2NgVY5ycREFpmd6MKM=
+github.com/bmaupin/go-epub v1.1.0/go.mod h1:mBan+0WgVv5JbPNw1xfnfQoTRN9iPMKBshZwPOL0SY0=
 github.com/gabriel-vasile/mimetype v1.3.1 h1:qevA6c2MtE1RorlScnixeG0VA1H4xrXyhyX3oWBynNQ=
 github.com/gabriel-vasile/mimetype v1.3.1/go.mod h1:fA8fi6KUiG7MgQQ+mEWotXoEOvmxRtOJlERCzSmRvr8=
 github.com/gofrs/uuid v3.1.0+incompatible h1:q2rtkjaKT4YEr6E1kamy0Ha4RtepWlQBedyHx0uzKwA=

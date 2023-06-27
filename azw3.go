@@ -34,13 +34,26 @@ func (convert Azw3Converter) Build(book Book) error {
 			Language:    language.MustParse(book.Lang),
 			UniqueID:    rand.Uint32(),
 		}
-		css := fmt.Sprintf(cssContent, book.Align, book.Bottom, book.Indent)
+		var excss string
+		if book.LineHeight != "" {
+			excss = fmt.Sprintf("line-height: %s;", book.LineHeight)
+		}
+		css := fmt.Sprintf(cssContent, book.Align, book.Bottom, book.Indent, excss)
 		for _, section := range chunk {
 			ch := mobi.Chapter{
 				Title:  section.Title,
 				Chunks: mobi.Chunks(convert.wrapTitle(section.Title, section.Content, book.Align)),
 			}
 			mb.Chapters = append(mb.Chapters, ch)
+			if len(section.Sections) > 0 {
+				for _, subsection := range section.Sections {
+					ch := mobi.Chapter{
+						Title:  subsection.Title,
+						Chunks: mobi.Chunks(convert.wrapTitle(subsection.Title, subsection.Content, book.Align)),
+					}
+					mb.Chapters = append(mb.Chapters, ch)
+				}
+			}
 		}
 
 		mb.CSSFlows = []string{css}

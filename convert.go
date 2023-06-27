@@ -27,12 +27,15 @@ type Book struct {
 	Filename       string    // 目录
 	Bookname       string    // 书名
 	Match          string    // 正则
+	VolumeMatch    string    // 卷匹配规则
 	Author         string    // 作者
 	Max            uint      // 标题最大字数
 	Indent         uint      // 段落缩进字段
 	Align          string    // 标题对齐方式
+	UnknowTitle    string    // 未知章节名称
 	Cover          string    // 封面图片
 	Bottom         string    // 段阿落间距
+	LineHeight     string    // 行高
 	Tips           bool      // 是否添加教程文本
 	Lang           string    // 设置语言
 	Out            string    // 输出文件名
@@ -41,13 +44,14 @@ type Book struct {
 	Decoder        *encoding.Decoder
 	PageStylesFile string
 	Reg            *regexp.Regexp
-	Reg2           *regexp.Regexp
+	VolumeReg      *regexp.Regexp
 	version        string
 }
 
 type Section struct {
-	Title   string
-	Content string
+	Title    string
+	Content  string
+	Sections []Section
 }
 
 type Converter interface {
@@ -60,7 +64,7 @@ const (
 	htmlTitleStart     = `<h3 class="title">`
 	mobiTtmlTitleStart = `<h3 style="text-align:%s;">`
 	htmlTitleEnd       = "</h3>"
-	Match              = "^第[0-9一二三四五六七八九十零〇百千两 ]+卷"
+	VolumeMatch        = "^第[0-9一二三四五六七八九十零〇百千两 ]+卷"
 	DefaultMatchTips   = "^第[0-9一二三四五六七八九十零〇百千两 ]+[章回节集卷]|^[Ss]ection.{1,20}$|^[Cc]hapter.{1,20}$|^[Pp]age.{1,20}$|^\\d{1,4}$|^引子$|^楔子$|^章节目录|^章节|^序章"
 	cssContent         = `
 .title {text-align:%s}
@@ -68,6 +72,7 @@ const (
   margin-bottom: %s;
   margin-top: 0;
   text-indent: %dem;
+  %s
 }
 `
 	Tutorial = `本书由kaf-cli生成: <br/>
@@ -80,7 +85,9 @@ func NewBookSimple(filename string) (*Book, error) {
 		Filename:       filename,
 		Bookname:       "",
 		Match:          DefaultMatchTips,
+		VolumeMatch:    VolumeMatch,
 		Author:         "YSTYLE",
+		UnknowTitle:    "章节正文",
 		Max:            35,
 		Indent:         2,
 		Align:          GetEnv("KAF_CLI_ALIGN", "center"),
@@ -108,10 +115,13 @@ func NewBookArgs() *Book {
 	flag.StringVar(&book.Bookname, "bookname", "", "书名: 默认为txt文件名")
 	flag.UintVar(&book.Max, "max", 35, "标题最大字数")
 	flag.StringVar(&book.Match, "match", "", "匹配标题的正则表达式, 不写可以自动识别, 如果没生成章节就参考教程。例: -match 第.{1,8}章 表示第和章字之间可以有1-8个任意文字")
+	flag.StringVar(&book.VolumeMatch, "volumematch", VolumeMatch, "卷匹配规则")
+	flag.StringVar(&book.UnknowTitle, "unknowtitle", "章节正文", "未知章节默认名称")
 	flag.UintVar(&book.Indent, "indent", 2, "段落缩进字数")
 	flag.StringVar(&book.Align, "align", GetEnv("KAF_CLI_ALIGN", "center"), "标题对齐方式: left、center、righ。环境变量KAF_CLI_ALIGN可修改默认值")
 	flag.StringVar(&book.Cover, "cover", "cover.png", "封面图片")
 	flag.StringVar(&book.Bottom, "bottom", "1em", "段落间距(单位可以为em、px)")
+	flag.StringVar(&book.LineHeight, "lineheight", "", "行高(用于设置行间距, 默认为1.5rem)")
 	flag.StringVar(&book.Format, "format", GetEnv("KAF_CLI_FORMAT", "all"), "书籍格式: all、epub、mobi、azw3。环境变量KAF_CLI_FORMAT可修改默认值")
 	flag.StringVar(&book.Lang, "lang", GetEnv("KAF_CLI_LANG", "zh"), "设置语言: en,de,fr,it,es,zh,ja,pt,ru,nl。环境变量KAF_CLI_LANG可修改默认值")
 	flag.BoolVar(&book.Tips, "tips", true, "添加本软件教程")
@@ -169,8 +179,11 @@ func (book *Book) Check(version string) error {
 		return fmt.Errorf("生成匹配规则出错: %s\n%s\n", book.Match, err.Error())
 	}
 	book.Reg = reg
-	reg2, _ := regexp.Compile(Match)
-	book.Reg2 = reg2
+	reg2, err := regexp.Compile(book.VolumeMatch)
+	if err != nil {
+		return fmt.Errorf("生成匹配规则出错: %s\n%s\n", book.VolumeMatch, err.Error())
+	}
+	book.VolumeReg = reg2
 	return nil
 }
 
@@ -220,6 +233,7 @@ func (book Book) ToString() {
 	} else {
 		fmt.Println("匹配条件:", book.Match)
 	}
+	fmt.Println("卷匹配条件:", book.VolumeMatch)
 	fmt.Println("转换格式:", book.Format)
 	fmt.Println()
 }
@@ -230,10 +244,11 @@ func (book *Book) Parse() error {
 	start := time.Now()
 	buf := book.readBuffer(book.Filename)
 	var title string
+	var volume *Section
 	var content bytes.Buffer
 	if book.Tips {
 		contentList = append(contentList, Section{
-			Title:   "说明",
+			Title:   "制作说明",
 			Content: Tutorial,
 		})
 	}
@@ -246,10 +261,17 @@ func (book *Book) Parse() error {
 						addPart(&content, line)
 					}
 				}
-				contentList = append(contentList, Section{
+				section := Section{
 					Title:   title,
 					Content: content.String(),
-				})
+				}
+				if volume == nil {
+					contentList = append(contentList, section)
+				} else {
+					volume.Sections = append(volume.Sections, section)
+					contentList = append(contentList, *volume)
+					volume = nil
+				}
 				content.Reset()
 				break
 			}
@@ -262,16 +284,30 @@ func (book *Book) Parse() error {
 		if len(line) == 0 {
 			continue
 		}
+		if book.VolumeReg.MatchString(line) {
+			if volume != nil {
+				contentList = append(contentList, *volume)
+			}
+			volume = &Section{
+				Title: line,
+			}
+			continue
+		}
 		// 处理标题
 		if utf8.RuneCountInString(line) <= int(book.Max) && book.Reg.MatchString(line) {
 			if title == "" {
-				title = "章节正文"
+				title = book.UnknowTitle
 			}
 			if content.Len() > 0 {
-				contentList = append(contentList, Section{
+				section := Section{
 					Title:   title,
 					Content: content.String(),
-				})
+				}
+				if volume == nil || section.Title == book.UnknowTitle {
+					contentList = append(contentList, section)
+				} else {
+					volume.Sections = append(volume.Sections, section)
+				}
 			}
 			title = line
 			content.Reset()
@@ -284,14 +320,24 @@ func (book *Book) Parse() error {
 		if title == "" {
 			title = "章节正文"
 		}
-		contentList = append(contentList, Section{
+		section := Section{
 			Title:   title,
 			Content: content.String(),
-		})
+		}
+		if volume == nil {
+			contentList = append(contentList, section)
+		} else {
+			volume.Sections = append(volume.Sections, section)
+			contentList = append(contentList, *volume)
+			volume = nil
+		}
+	}
+	if volume != nil {
+		contentList = append(contentList, *volume)
 	}
 	end := time.Now().Sub(start)
 	fmt.Println("读取文件耗时:", end)
-	fmt.Println("匹配章节:", len(contentList))
+	fmt.Println("匹配章节:", sectionCount(contentList))
 	// 添加提示
 	if book.Tips {
 		contentList = append(contentList, Section{
@@ -301,6 +347,14 @@ func (book *Book) Parse() error {
 	}
 	book.SectionList = contentList
 	return nil
+}
+
+func sectionCount(sections []Section) int {
+	var count int
+	for _, section := range sections {
+		count += 1 + len(section.Sections)
+	}
+	return count
 }
 
 func (book *Book) Convert() {

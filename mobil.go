@@ -25,6 +25,11 @@ func (convert MobiConverter) Build(book Book) error {
 	m.NewExthRecord(mobi.EXTH_AUTHOR, book.Author)
 	for _, section := range book.SectionList {
 		m.NewChapter(section.Title, []byte(section.Content))
+		if len(section.Sections) > 0 {
+			for _, subsection := range section.Sections {
+				m.NewChapter(subsection.Title, []byte(subsection.Content))
+			}
+		}
 	}
 	m.Write()
 	fmt.Println("生成mobi电子书耗时:", time.Now().Sub(start))
