@@ -43,9 +43,9 @@
 ### 命令行模式参数
 
 ```text
-Usage of kaf-cli.exe:
+Usage of kaf-cli:
   -align string
-        标题对齐方式: left、center、righ (default "center")
+        标题对齐方式: left、center、righ。环境变量KAF_CLI_ALIGN可修改默认值 (default "center")
   -author string
         作者 (default "YSTYLE")
   -bookname string
@@ -57,19 +57,25 @@ Usage of kaf-cli.exe:
   -filename string
         txt 文件名
   -format string
-        书籍格式: all、epub、mobi、azw3 (default "all")
+        书籍格式: all、epub、mobi、azw3。环境变量KAF_CLI_FORMAT可修改默认值 (default "all")
   -indent uint
         段落缩进字数 (default 2)
   -lang string
-        设置语言: en,de,fr,it,es,zh,ja,pt,ru,nl。 环境变量KAF_CLI_LANG可修改默认值 (default "zh")
+        设置语言: en,de,fr,it,es,zh,ja,pt,ru,nl。环境变量KAF_CLI_LANG可修改默认值 (default "en")
+  -lineheight string
+        行高(用于设置行间距, 默认为1.5rem)
   -match string
-        匹配标题的正则表达式, 不写可以自动识别, 如果没生成章节就参考教程。例: -match 第.{1,8}章 表示第和章字之间可以有1-8个任意文字 (default "自动匹配,可自定义")
+        匹配标题的正则表达式, 不写可以自动识别, 如果没生成章节就参考教程。例: -match 第.{1,8}章 表示第和章字之间可以有1-8个任意文字
   -max uint
         标题最大字数 (default 35)
   -out string
         输出文件名，不需要包含格式后缀
   -tips
         添加本软件教程 (default true)
+  -unknowtitle string
+        未知章节默认名称 (default "章节正文")
+  -volumematch string
+        卷匹配规则 (default "^第[0-9一二三四五六七八九十零〇百千两 ]+卷")
 
 ```
 
