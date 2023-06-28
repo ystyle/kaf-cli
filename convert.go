@@ -34,6 +34,8 @@ type Book struct {
 	Align          string    // 标题对齐方式
 	UnknowTitle    string    // 未知章节名称
 	Cover          string    // 封面图片
+	CoverOrlyColor string    // 生成封面图片的颜色
+	CoverOrlyIdx   int       // 生成封面图片的动物
 	Bottom         string    // 段阿落间距
 	LineHeight     string    // 行高
 	Tips           bool      // 是否添加教程文本
@@ -119,13 +121,15 @@ func NewBookArgs() *Book {
 	flag.StringVar(&book.UnknowTitle, "unknowtitle", "章节正文", "未知章节默认名称")
 	flag.UintVar(&book.Indent, "indent", 2, "段落缩进字数")
 	flag.StringVar(&book.Align, "align", GetEnv("KAF_CLI_ALIGN", "center"), "标题对齐方式: left、center、righ。环境变量KAF_CLI_ALIGN可修改默认值")
-	flag.StringVar(&book.Cover, "cover", "cover.png", "封面图片")
+	flag.StringVar(&book.Cover, "cover", "cover.png", "封面图片可为: 本地图片, 和orly。 设置为orly时生成orly风格的封面, 需要连接网络。")
+	flag.StringVar(&book.CoverOrlyColor, "coverorlycolor", "", "orly封面的主题色, 可以为1-16和hex格式的颜色代码, 不填时随机")
+	flag.IntVar(&book.CoverOrlyIdx, "coverorlyidx", -1, "orly封面的动物, 可以为0-41, 不填时随机, 具体图案可以查看: https://orly.nanmu.me")
 	flag.StringVar(&book.Bottom, "bottom", "1em", "段落间距(单位可以为em、px)")
 	flag.StringVar(&book.LineHeight, "lineheight", "", "行高(用于设置行间距, 默认为1.5rem)")
 	flag.StringVar(&book.Format, "format", GetEnv("KAF_CLI_FORMAT", "all"), "书籍格式: all、epub、mobi、azw3。环境变量KAF_CLI_FORMAT可修改默认值")
 	flag.StringVar(&book.Lang, "lang", GetEnv("KAF_CLI_LANG", "zh"), "设置语言: en,de,fr,it,es,zh,ja,pt,ru,nl。环境变量KAF_CLI_LANG可修改默认值")
-	flag.BoolVar(&book.Tips, "tips", true, "添加本软件教程")
 	flag.StringVar(&book.Out, "out", "", "输出文件名，不需要包含格式后缀")
+	flag.BoolVar(&book.Tips, "tips", true, "添加本软件教程")
 	flag.Parse()
 	return &book
 }
@@ -167,9 +171,21 @@ func (book *Book) Check(version string) error {
 		book.Out = book.Bookname
 	}
 	book.Lang = parseLang(book.Lang)
-	if exists, _ := isExists(book.Cover); !exists {
+	switch book.Cover {
+	case "none":
 		book.Cover = ""
+	case "gen":
+		cover, err := GenCover(book.Bookname, book.Author, book.CoverOrlyColor, book.CoverOrlyIdx)
+		if err != nil {
+			panic(err)
+		}
+		book.Cover = cover
+	default:
+		if exists, _ := isExists(book.Cover); !exists {
+			book.Cover = ""
+		}
 	}
+
 	// 编译正则表达式
 	if book.Match == "" {
 		book.Match = DefaultMatchTips
