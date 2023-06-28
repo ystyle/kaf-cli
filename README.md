@@ -5,16 +5,20 @@
 ### 功能
 - 傻瓜操作模式(把txt文件拖到`kaf-cli.exe`上面自动转换)
 - 自定义封面
+- 支持生成Orly风格的书籍封面
 - 自动识别书名和章节(示例中所有用法都会自动识别)
 - 自动识别字符编码(自动解决中文乱码)
 - 自定义章节标题识别规则
+- 自定义卷的标题识别规则(卷的规则同时也需要能识别成标题)
 - 自动给章节正文生成加粗居中的标题
 - 自定义标题对齐方式
 - 段落自动识别
 - 段落自动缩进
 - 自定义段落缩进字数
 - 自定义段落间距
+- 自定义行间距
 - 自定义书籍语言
+- epub格式支持嵌入字体
 - 知轩藏书格式文件名会自动提取书名和作者, 例: `《希灵帝国》（校对版全本）作者：远瞳.txt`
 - 超快速(130章/s以上速度, 4000章30s不到)
 - 自动转为mobi格式
@@ -53,16 +57,22 @@ Usage of kaf-cli:
   -bottom string
         段落间距(单位可以为em、px) (default "1em")
   -cover string
-        封面图片 (default "cover.png")
+        封面图片可为: 本地图片, 和orly。 设置为orly时生成orly风格的封面, 需要连接网络。 (default "cover.png")
+  -cover-orly-color string
+        orly封面的主题色, 可以为1-16和hex格式的颜色代码, 不填时随机
+  -cover-orly-idx int
+        orly封面的动物, 可以为0-41, 不填时随机, 具体图案可以查看: https://orly.nanmu.me (default -1)
   -filename string
         txt 文件名
+  -font string
+        嵌入字体, 之后epub的正文都将使用该字体
   -format string
         书籍格式: all、epub、mobi、azw3。环境变量KAF_CLI_FORMAT可修改默认值 (default "all")
   -indent uint
         段落缩进字数 (default 2)
   -lang string
         设置语言: en,de,fr,it,es,zh,ja,pt,ru,nl。环境变量KAF_CLI_LANG可修改默认值 (default "en")
-  -lineheight string
+  -line-height string
         行高(用于设置行间距, 默认为1.5rem)
   -match string
         匹配标题的正则表达式, 不写可以自动识别, 如果没生成章节就参考教程。例: -match 第.{1,8}章 表示第和章字之间可以有1-8个任意文字
@@ -72,11 +82,10 @@ Usage of kaf-cli:
         输出文件名，不需要包含格式后缀
   -tips
         添加本软件教程 (default true)
-  -unknowtitle string
+  -unknow-title string
         未知章节默认名称 (default "章节正文")
-  -volumematch string
-        卷匹配规则 (default "^第[0-9一二三四五六七八九十零〇百千两 ]+卷")
-
+  -volume-match string
+        卷匹配规则 (default "^第[0-9一二三四五六七八九十零〇百千两 ]+[卷部]")
 ```
 
 >PS: 在darwin(mac、osx)上`-tips`参数要设置为false的方法 `kaf-cli -filename 小说.txt -tips=0`
