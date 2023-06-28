@@ -65,7 +65,7 @@ const (
 	mobiTtmlTitleStart = `<h3 style="text-align:%s;">`
 	htmlTitleEnd       = "</h3>"
 	VolumeMatch        = "^第[0-9一二三四五六七八九十零〇百千两 ]+[卷部]"
-	DefaultMatchTips   = "^第[0-9一二三四五六七八九十零〇百千两 ]+[章回节集]|^[Ss]ection.{1,20}$|^[Cc]hapter.{1,20}$|^[Pp]age.{1,20}$|^\\d{1,4}$|^引子$|^楔子$|^章节目录|^章节|^序章"
+	DefaultMatchTips   = "^第[0-9一二三四五六七八九十零〇百千两 ]+[章回节集卷部]|^[Ss]ection.{1,20}$|^[Cc]hapter.{1,20}$|^[Pp]age.{1,20}$|^\\d{1,4}$|^引子$|^楔子$|^章节目录|^章节|^序章"
 	cssContent         = `
 .title {text-align:%s}
 .content {
@@ -244,14 +244,7 @@ func (book *Book) Parse() error {
 	start := time.Now()
 	buf := book.readBuffer(book.Filename)
 	var title string
-	var volume *Section
 	var content bytes.Buffer
-	if book.Tips {
-		contentList = append(contentList, Section{
-			Title:   "制作说明",
-			Content: Tutorial,
-		})
-	}
 	for {
 		line, err := buf.ReadString('\n')
 		if err != nil {
@@ -261,17 +254,10 @@ func (book *Book) Parse() error {
 						addPart(&content, line)
 					}
 				}
-				section := Section{
+				contentList = append(contentList, Section{
 					Title:   title,
 					Content: content.String(),
-				}
-				if volume == nil {
-					contentList = append(contentList, section)
-				} else {
-					volume.Sections = append(volume.Sections, section)
-					contentList = append(contentList, *volume)
-					volume = nil
-				}
+				})
 				content.Reset()
 				break
 			}
@@ -284,36 +270,16 @@ func (book *Book) Parse() error {
 		if len(line) == 0 {
 			continue
 		}
-		if book.VolumeReg.MatchString(line) {
-			if volume != nil {
-				section := Section{
-					Title:   title,
-					Content: content.String(),
-				}
-				volume.Sections = append(volume.Sections, section)
-				content.Reset()
-				contentList = append(contentList, *volume)
-			}
-			volume = &Section{
-				Title: line,
-			}
-			continue
-		}
 		// 处理标题
 		if utf8.RuneCountInString(line) <= int(book.Max) && book.Reg.MatchString(line) {
 			if title == "" {
 				title = book.UnknowTitle
 			}
-			if content.Len() > 0 {
-				section := Section{
+			if content.Len() > 0 || title != book.UnknowTitle {
+				contentList = append(contentList, Section{
 					Title:   title,
 					Content: content.String(),
-				}
-				if volume == nil || section.Title == book.UnknowTitle {
-					contentList = append(contentList, section)
-				} else {
-					volume.Sections = append(volume.Sections, section)
-				}
+				})
 			}
 			title = line
 			content.Reset()
@@ -326,32 +292,47 @@ func (book *Book) Parse() error {
 		if title == "" {
 			title = "章节正文"
 		}
-		section := Section{
+		contentList = append(contentList, Section{
 			Title:   title,
 			Content: content.String(),
-		}
-		if volume == nil {
-			contentList = append(contentList, section)
+		})
+	}
+	var sectionList []Section
+	var volumeSection *Section
+	for _, section := range contentList {
+		if book.VolumeReg.MatchString(section.Title) {
+			if volumeSection != nil {
+				sectionList = append(sectionList, *volumeSection)
+				volumeSection = nil
+			}
+			temp := section
+			volumeSection = &temp
 		} else {
-			volume.Sections = append(volume.Sections, section)
-			contentList = append(contentList, *volume)
-			volume = nil
+			if volumeSection == nil {
+				sectionList = append(sectionList, section)
+			} else {
+				volumeSection.Sections = append(volumeSection.Sections, section)
+			}
 		}
 	}
-	if volume != nil {
-		contentList = append(contentList, *volume)
+	// 如果有最后一卷,添加到章节列表
+	if volumeSection != nil {
+		sectionList = append(sectionList, *volumeSection)
+		volumeSection = nil
 	}
 	end := time.Now().Sub(start)
 	fmt.Println("读取文件耗时:", end)
-	fmt.Println("匹配章节:", sectionCount(contentList))
+	fmt.Println("匹配章节:", sectionCount(sectionList))
 	// 添加提示
 	if book.Tips {
-		contentList = append(contentList, Section{
+		tuorialSection := Section{
 			Title:   "制作说明",
 			Content: Tutorial,
-		})
+		}
+		sectionList = append([]Section{tuorialSection}, sectionList...)
+		sectionList = append(sectionList, tuorialSection)
 	}
-	book.SectionList = contentList
+	book.SectionList = sectionList
 	return nil
 }
 
