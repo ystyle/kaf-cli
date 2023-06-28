@@ -36,6 +36,7 @@ type Book struct {
 	Cover          string    // 封面图片
 	CoverOrlyColor string    // 生成封面图片的颜色
 	CoverOrlyIdx   int       // 生成封面图片的动物
+	Font           string    // 嵌入字体
 	Bottom         string    // 段阿落间距
 	LineHeight     string    // 行高
 	Tips           bool      // 是否添加教程文本
@@ -117,15 +118,16 @@ func NewBookArgs() *Book {
 	flag.StringVar(&book.Bookname, "bookname", "", "书名: 默认为txt文件名")
 	flag.UintVar(&book.Max, "max", 35, "标题最大字数")
 	flag.StringVar(&book.Match, "match", "", "匹配标题的正则表达式, 不写可以自动识别, 如果没生成章节就参考教程。例: -match 第.{1,8}章 表示第和章字之间可以有1-8个任意文字")
-	flag.StringVar(&book.VolumeMatch, "volumematch", VolumeMatch, "卷匹配规则")
-	flag.StringVar(&book.UnknowTitle, "unknowtitle", "章节正文", "未知章节默认名称")
+	flag.StringVar(&book.VolumeMatch, "volume-match", VolumeMatch, "卷匹配规则")
+	flag.StringVar(&book.UnknowTitle, "unknow-title", "章节正文", "未知章节默认名称")
 	flag.UintVar(&book.Indent, "indent", 2, "段落缩进字数")
 	flag.StringVar(&book.Align, "align", GetEnv("KAF_CLI_ALIGN", "center"), "标题对齐方式: left、center、righ。环境变量KAF_CLI_ALIGN可修改默认值")
 	flag.StringVar(&book.Cover, "cover", "cover.png", "封面图片可为: 本地图片, 和orly。 设置为orly时生成orly风格的封面, 需要连接网络。")
-	flag.StringVar(&book.CoverOrlyColor, "coverorlycolor", "", "orly封面的主题色, 可以为1-16和hex格式的颜色代码, 不填时随机")
-	flag.IntVar(&book.CoverOrlyIdx, "coverorlyidx", -1, "orly封面的动物, 可以为0-41, 不填时随机, 具体图案可以查看: https://orly.nanmu.me")
+	flag.StringVar(&book.CoverOrlyColor, "cover-orly-color", "", "orly封面的主题色, 可以为1-16和hex格式的颜色代码, 不填时随机")
+	flag.IntVar(&book.CoverOrlyIdx, "cover-orly-idx", -1, "orly封面的动物, 可以为0-41, 不填时随机, 具体图案可以查看: https://orly.nanmu.me")
 	flag.StringVar(&book.Bottom, "bottom", "1em", "段落间距(单位可以为em、px)")
-	flag.StringVar(&book.LineHeight, "lineheight", "", "行高(用于设置行间距, 默认为1.5rem)")
+	flag.StringVar(&book.LineHeight, "line-height", "", "行高(用于设置行间距, 默认为1.5rem)")
+	flag.StringVar(&book.Font, "font", "", "嵌入字体, 之后epub的正文都将使用该字体")
 	flag.StringVar(&book.Format, "format", GetEnv("KAF_CLI_FORMAT", "all"), "书籍格式: all、epub、mobi、azw3。环境变量KAF_CLI_FORMAT可修改默认值")
 	flag.StringVar(&book.Lang, "lang", GetEnv("KAF_CLI_LANG", "zh"), "设置语言: en,de,fr,it,es,zh,ja,pt,ru,nl。环境变量KAF_CLI_LANG可修改默认值")
 	flag.StringVar(&book.Out, "out", "", "输出文件名，不需要包含格式后缀")
@@ -174,7 +176,7 @@ func (book *Book) Check(version string) error {
 	switch book.Cover {
 	case "none":
 		book.Cover = ""
-	case "gen":
+	case "gen", "orly":
 		cover, err := GenCover(book.Bookname, book.Author, book.CoverOrlyColor, book.CoverOrlyIdx)
 		if err != nil {
 			panic(err)
