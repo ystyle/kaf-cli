@@ -289,7 +289,8 @@ func (book *Book) Parse() error {
 			continue
 		}
 		// 处理标题
-		if utf8.RuneCountInString(line) <= int(book.Max) && book.Reg.MatchString(line) {
+		if utf8.RuneCountInString(line) <= int(book.Max) &&
+			(book.Reg.MatchString(line) || book.VolumeReg.MatchString(line)) {
 			if title == "" {
 				title = book.UnknowTitle
 			}
