@@ -68,7 +68,7 @@ const (
 	mobiTtmlTitleStart = `<h3 style="text-align:%s;">`
 	htmlTitleEnd       = "</h3>"
 	VolumeMatch        = "^第[0-9一二三四五六七八九十零〇百千两 ]+[卷部]"
-	DefaultMatchTips   = "^第[0-9一二三四五六七八九十零〇百千两 ]+[章回节集卷部]|^[Ss]ection.{1,20}$|^[Cc]hapter.{1,20}$|^[Pp]age.{1,20}$|^\\d{1,4}$|^引子$|^楔子$|^章节目录|^章节|^序章"
+	DefaultMatchTips   = "^第[0-9一二三四五六七八九十零〇百千两 ]+[章回节集卷部]|^[Ss]ection.{1,20}$|^[Cc]hapter.{1,20}$|^[Pp]age.{1,20}$|^\\d{1,4}$|^\\d+、|^引子$|^楔子$|^章节目录|^章节|^序章"
 	cssContent         = `
 .title {text-align:%s}
 .content {
@@ -85,62 +85,51 @@ const (
 
 func NewBookSimple(filename string) (*Book, error) {
 	book := Book{
-		Filename:       filename,
-		Bookname:       "",
-		Match:          DefaultMatchTips,
-		VolumeMatch:    VolumeMatch,
-		Author:         "YSTYLE",
-		UnknowTitle:    "章节正文",
-		Max:            35,
-		Indent:         2,
-		Align:          GetEnv("KAF_CLI_ALIGN", "center"),
-		Cover:          "cover.png",
-		Bottom:         "1em",
-		Tips:           true,
-		Lang:           GetEnv("KAF_CLI_LANG", "zh"),
-		Out:            "",
-		Format:         GetEnv("KAF_CLI_FORMAT", "all"),
-		SectionList:    nil,
-		Decoder:        nil,
-		PageStylesFile: "",
-		Reg:            nil,
+		Filename: filename,
 	}
-	if os.Getenv("KAF_CLI_LANG") != "" {
-		book.Lang = os.Getenv("KAF_CLI_LANG")
-	}
+	book.SetDefault()
 	return &book, nil
 }
 
 func NewBookArgs() *Book {
 	var book Book
 	flag.StringVar(&book.Filename, "filename", "", "txt 文件名")
-	flag.StringVar(&book.Author, "author", "YSTYLE", "作者")
 	flag.StringVar(&book.Bookname, "bookname", "", "书名: 默认为txt文件名")
-	flag.UintVar(&book.Max, "max", 35, "标题最大字数")
+	flag.StringVar(&book.Author, "author", "YSTYLE", "作者")
 	flag.StringVar(&book.Match, "match", "", "匹配标题的正则表达式, 不写可以自动识别, 如果没生成章节就参考教程。例: -match 第.{1,8}章 表示第和章字之间可以有1-8个任意文字")
-	flag.StringVar(&book.VolumeMatch, "volume-match", VolumeMatch, "卷匹配规则")
+	flag.StringVar(&book.VolumeMatch, "volume-match", VolumeMatch, "卷匹配规则,设置为false可以禁用卷识别")
 	flag.StringVar(&book.UnknowTitle, "unknow-title", "章节正文", "未知章节默认名称")
-	flag.UintVar(&book.Indent, "indent", 2, "段落缩进字数")
-	flag.StringVar(&book.Align, "align", GetEnv("KAF_CLI_ALIGN", "center"), "标题对齐方式: left、center、righ。环境变量KAF_CLI_ALIGN可修改默认值")
 	flag.StringVar(&book.Cover, "cover", "cover.png", "封面图片可为: 本地图片, 和orly。 设置为orly时生成orly风格的封面, 需要连接网络。")
 	flag.StringVar(&book.CoverOrlyColor, "cover-orly-color", "", "orly封面的主题色, 可以为1-16和hex格式的颜色代码, 不填时随机")
 	flag.IntVar(&book.CoverOrlyIdx, "cover-orly-idx", -1, "orly封面的动物, 可以为0-41, 不填时随机, 具体图案可以查看: https://orly.nanmu.me")
+	flag.UintVar(&book.Max, "max", 35, "标题最大字数")
+	flag.UintVar(&book.Indent, "indent", 2, "段落缩进字数")
+	flag.StringVar(&book.Align, "align", GetEnv("KAF_CLI_ALIGN", "center"), "标题对齐方式: left、center、righ。环境变量KAF_CLI_ALIGN可修改默认值")
 	flag.StringVar(&book.Bottom, "bottom", "1em", "段落间距(单位可以为em、px)")
 	flag.StringVar(&book.LineHeight, "line-height", "", "行高(用于设置行间距, 默认为1.5rem)")
 	flag.StringVar(&book.Font, "font", "", "嵌入字体, 之后epub的正文都将使用该字体")
-	flag.StringVar(&book.Format, "format", GetEnv("KAF_CLI_FORMAT", "all"), "书籍格式: all、epub、mobi、azw3。环境变量KAF_CLI_FORMAT可修改默认值")
 	flag.StringVar(&book.Lang, "lang", GetEnv("KAF_CLI_LANG", "zh"), "设置语言: en,de,fr,it,es,zh,ja,pt,ru,nl。环境变量KAF_CLI_LANG可修改默认值")
+	flag.StringVar(&book.Format, "format", GetEnv("KAF_CLI_FORMAT", "all"), "书籍格式: all、epub、mobi、azw3。环境变量KAF_CLI_FORMAT可修改默认值")
 	flag.StringVar(&book.Out, "out", "", "输出文件名，不需要包含格式后缀")
 	flag.BoolVar(&book.Tips, "tips", true, "添加本软件教程")
 	flag.Parse()
 	return &book
 }
-
+func (book *Book) SetDefault() {
+	book.Match = defaultString(book.Match, DefaultMatchTips)
+	book.VolumeMatch = defaultString(book.VolumeMatch, VolumeMatch)
+	book.Author = defaultString(book.Author, "YSTYLE")
+	book.UnknowTitle = defaultString(book.UnknowTitle, "章节正文")
+	book.Max = defalutInt(book.Max, 35)
+	book.Indent = defalutInt(book.Indent, 2)
+	book.Align = defaultString(book.Align, GetEnv("KAF_CLI_ALIGN", "center"))
+	book.Cover = defaultString(book.Cover, "cover.png")
+	book.Bottom = defaultString(book.Bottom, "1em")
+	book.Lang = defaultString(book.Lang, GetEnv("KAF_CLI_LANG", "zh"))
+	book.Format = defaultString(book.Format, GetEnv("KAF_CLI_FORMAT", "all"))
+}
 func (book *Book) Check(version string) error {
 	book.version = version
-	if !strings.HasSuffix(book.Filename, ".txt") {
-		return errors.New("不是txt文件")
-	}
 	if book.Filename == "" {
 		fmt.Println("错误: 文件名不能为空")
 		fmt.Println("软件版本: \t", version)
@@ -153,8 +142,11 @@ func (book *Book) Check(version string) error {
 		}
 		os.Exit(0)
 	}
+	if !strings.HasSuffix(book.Filename, ".txt") {
+		return errors.New("不是txt文件")
+	}
 	// 通过文件名解析书名
-	reg, _ := regexp.Compile(`《(.*)》.*作者：(.*).txt`)
+	reg, _ := regexp.Compile(`《(.*)》.*作者[：:](.*).txt`)
 	if reg.MatchString(book.Filename) {
 		group := reg.FindAllStringSubmatch(book.Filename, -1)
 		if len(group) == 1 && len(group[0]) >= 3 {
@@ -236,7 +228,7 @@ func (book *Book) readBuffer(filename string) *bufio.Reader {
 	}
 }
 
-func (book Book) ToString() {
+func (book *Book) ToString() {
 	fmt.Println("转换信息:")
 	fmt.Println("软件版本:", book.version)
 	fmt.Println("文件名:\t", book.Filename)
@@ -319,7 +311,7 @@ func (book *Book) Parse() error {
 	var sectionList []Section
 	var volumeSection *Section
 	for _, section := range contentList {
-		if book.VolumeReg.MatchString(section.Title) {
+		if book.VolumeMatch != "false" && book.VolumeReg.MatchString(section.Title) {
 			if volumeSection != nil {
 				sectionList = append(sectionList, *volumeSection)
 				volumeSection = nil

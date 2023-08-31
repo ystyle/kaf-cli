@@ -59,10 +59,7 @@ func converToMobi(bookname, lang string) {
 	fmt.Printf("\n检测到Kindle格式转换器: %s，正在把书籍转换成Kindle格式...\n", command)
 	fmt.Println("转换mobi比较花时间, 大约耗时1-10分钟, 请等待...")
 	start := time.Now()
-	err := run(command, "-dont_append_source", "-locale", lang, "-c1", bookname)
-	if err != nil {
-		panic(err)
-	}
+	run(command, "-dont_append_source", "-locale", lang, "-c1", bookname)
 	// 计算耗时
 	end := time.Now().Sub(start)
 	fmt.Println("转换为mobi格式耗时:", end)
@@ -177,4 +174,27 @@ func GenCover(title, author, color string, img int) (string, error) {
 		return "", err
 	}
 	return coverfile, nil
+}
+
+type Number interface {
+	~int | ~uint
+}
+
+func defaultString(src, dst string) string {
+	if src == "" {
+		return dst
+	}
+	return src
+}
+func defalutInt[T Number](src, dst T) T {
+	if src == 0 {
+		return dst
+	}
+	return src
+}
+func defaultBool(src, dst bool) bool {
+	if src {
+		return src
+	}
+	return dst
 }

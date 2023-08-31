@@ -17,4 +17,4 @@ require (
 
 replace golang.org/x/text => github.com/golang/text v0.3.2
 
-go 1.19
+go 1.21
