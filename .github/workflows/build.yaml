@@ -58,6 +58,7 @@ jobs:
           zip -j kaf-cli_${version}_linux_amd64.zip   build/linux-amd64/kaf-cli
           zip -j kaf-cli_${version}_linux_arm64.zip   build/linux-arm64/kaf-cli
           zip -j kaf-cli_${version}_linux_loong64.zip build/linux-loong64/kaf-cli
+          zip -j kaf-cli_${version}_wasm_wasip1.zip   build/wasm-wasip1/kaf-cli README_wasi.md
 
       - name: Upload release binaries
         uses: alexellis/upload-assets@0.2.2
