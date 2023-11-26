@@ -15,6 +15,4 @@ require (
 	github.com/vincent-petithory/dataurl v0.0.0-20191104211930-d1553a71de50 // indirect
 )
 
-replace golang.org/x/text => github.com/golang/text v0.3.2
-
 go 1.21
