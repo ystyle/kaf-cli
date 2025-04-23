@@ -3,7 +3,12 @@ package main
 import "C"
 import (
 	"encoding/json"
-	kafcli "github.com/ystyle/kaf-cli"
+	"fmt"
+
+	"github.com/ystyle/kaf-cli/internal/converter"
+	"github.com/ystyle/kaf-cli/internal/core"
+	"github.com/ystyle/kaf-cli/internal/model"
+	"github.com/ystyle/kaf-cli/pkg/analytics"
 )
 
 var (
@@ -14,23 +19,44 @@ var (
 
 //export KafConvert
 func KafConvert(params *C.char) int64 {
-	var bookArg kafcli.Book
-	err := json.Unmarshal([]byte(C.GoString(params)), &bookArg)
+	var book model.Book
+	err := json.Unmarshal([]byte(C.GoString(params)), &book)
 	if err != nil {
 		return 1
 	}
-	bookArg.SetDefault()
-	if err := bookArg.Check(version); err != nil {
+	if err := core.Check(&book, version); err != nil {
 		return 2
 	}
-	kafcli.Analytics(version, secret, measurement, bookArg.Format)
-	if err := bookArg.Parse(); err != nil {
+	analytics.Analytics(version, secret, measurement, book.Format)
+	if err := core.Parse(&book); err != nil {
 		return 3
 	}
-	bookArg.Convert()
+	conv := converter.Dispatcher{
+		Book: &book,
+	}
+	if err := conv.Convert(); err != nil {
+		return 4
+	}
 	return 0
 }
 
+//export KafPreview
+func KafPreview(params *C.char) *C.char {
+	var bookArg model.Book
+	err := json.Unmarshal([]byte(C.GoString(params)), &bookArg)
+	if err != nil {
+		return C.CString(fmt.Sprintf("ERROR: 参数错误, %s", err.Error()))
+	}
+	if err := core.Check(&bookArg, version); err != nil {
+		return C.CString(fmt.Sprintf("ERROR: 参数错误, %s", err.Error()))
+	}
+	if err := core.Parse(&bookArg); err != nil {
+		return C.CString(fmt.Sprintf("ERROR: 解析错误, %s", err.Error()))
+	}
+	bs, _ := json.Marshal(bookArg.SectionList)
+	return C.CString(string(bs))
+
+}
 func main() {
 
 }

@@ -1,19 +1,36 @@
-package kafcli
+package converter
 
 import (
 	"bytes"
 	"fmt"
-	"github.com/leotaku/mobi"
-	"golang.org/x/text/language"
 	"image"
 	"math/rand"
 	"os"
 	"time"
+
+	"github.com/leotaku/mobi"
+	"github.com/ystyle/kaf-cli/internal/model"
+	"golang.org/x/text/language"
 )
 
-type Azw3Converter struct{}
+type Azw3Converter struct {
+	MobiTtmlTitleStart string // AZW3专属标题标签
+	HTMLTitleEnd       string
+	CSSContent         string
+}
 
-func (convert Azw3Converter) Build(book Book) error {
+func NewAzw3Converter() *Azw3Converter {
+	return &Azw3Converter{
+		MobiTtmlTitleStart: `<h3 style="text-align:%s;">`,
+		HTMLTitleEnd:       "</h3>",
+		CSSContent: `
+            .title {text-align: %s}
+            .content { margin-bottom: %s; text-indent: %dem; %s }
+        `,
+	}
+}
+
+func (convert Azw3Converter) Build(book model.Book) error {
 	fmt.Println("使用第三方库生成azw3, 不保证所有样式都能正常显示")
 	fmt.Println("正在生成azw3...")
 	start := time.Now()
@@ -38,7 +55,7 @@ func (convert Azw3Converter) Build(book Book) error {
 		if book.LineHeight != "" {
 			excss = fmt.Sprintf("line-height: %s;", book.LineHeight)
 		}
-		css := fmt.Sprintf(cssContent, book.Align, book.Bottom, book.Indent, excss)
+		css := fmt.Sprintf(convert.CSSContent, book.Align, book.Bottom, book.Indent, excss)
 		for _, section := range chunk {
 			ch := mobi.Chapter{
 				Title:  section.Title,
@@ -86,15 +103,15 @@ func (convert Azw3Converter) Build(book Book) error {
 
 func (convert Azw3Converter) wrapTitle(title, content, align string) string {
 	var buff bytes.Buffer
-	buff.WriteString(fmt.Sprintf(mobiTtmlTitleStart, align))
+	buff.WriteString(fmt.Sprintf(convert.MobiTtmlTitleStart, align))
 	buff.WriteString(title)
-	buff.WriteString(htmlTitleEnd)
+	buff.WriteString(convert.HTMLTitleEnd)
 	buff.WriteString(content)
 	return buff.String()
 }
 
-func SectionSliceChunk(s []Section, size int) [][]Section {
-	var ret [][]Section
+func SectionSliceChunk(s []model.Section, size int) [][]model.Section {
+	var ret [][]model.Section
 	for size < len(s) {
 		// s[:size:size] 表示 len 为 size，cap 也为 size，第二个冒号后的 size 表示 cap
 		s, ret = s[size:], append(ret, s[:size:size])

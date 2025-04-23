@@ -1,26 +1,48 @@
-package kafcli
+package converter
 
 import (
 	"bytes"
 	"fmt"
-	"github.com/bmaupin/go-epub"
 	"os"
 	"path/filepath"
 	"time"
+
+	"github.com/bmaupin/go-epub"
+	"github.com/ystyle/kaf-cli/internal/model"
+	"github.com/ystyle/kaf-cli/internal/utils"
 )
 
-type EpubConverter struct{}
+type EpubConverter struct {
+	HTMLPStart     string // EPUB专属段落标签
+	HTMLPEnd       string
+	HTMLTitleStart string
+	HTMLTitleEnd   string
+	CSSContent     string
+}
+
+func NewEpubConverter() *EpubConverter {
+	return &EpubConverter{
+		HTMLPStart:     `<p class="content">`,
+		HTMLPEnd:       "</p>",
+		HTMLTitleStart: `<h3 class="title">`,
+		HTMLTitleEnd:   "</h3>",
+		CSSContent: `
+            .title {text-align: %s}
+            .content { margin-bottom: %s; text-indent: %dem; %s }
+        `,
+	}
+}
 
 func (convert EpubConverter) wrapTitle(title, content string) string {
 	var buff bytes.Buffer
-	buff.WriteString(htmlTitleStart)
+	buff.WriteString(convert.HTMLTitleStart)
 	buff.WriteString(title)
-	buff.WriteString(htmlTitleEnd)
+	buff.WriteString(convert.HTMLTitleEnd)
 	buff.WriteString(content)
 	return buff.String()
 }
 
-func (convert EpubConverter) Build(book Book) error {
+func (convert EpubConverter) Build(book model.Book) error {
 	fmt.Println("正在生成epub")
 	start := time.Now()
 	// 写入样式
@@ -38,12 +60,12 @@ func (convert EpubConverter) Build(book Book) error {
 	e.SetAuthor(book.Author)
 
 	pageStylesFile := filepath.Join(tempDir, "page_styles.css")
-	var epubcss = cssContent
+	var epubcss = convert.CSSContent
 	var excss string
 	if book.LineHeight != "" {
 		excss = fmt.Sprintf("line-height: %s;", book.LineHeight)
 	}
-	if b, _ := isExists(book.Font); b {
+	if b, _ := utils.IsExists(book.Font); b {
 		fontfile, _ := e.AddFont(book.Font, "")
 		excss += `
 font-family: "embedfont";

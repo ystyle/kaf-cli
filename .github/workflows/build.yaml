@@ -37,15 +37,15 @@ jobs:
           go get github.com/akavel/rsrc
           go install github.com/akavel/rsrc
           go mod tidy
-          GOOS=linux   GOARCH=amd64   go build -ldflags "$flag" -o build/linux-amd64/kaf-cli       cmd/cli.go
-          GOOS=linux   GOARCH=arm64   go build -ldflags "$flag" -o build/linux-arm64/kaf-cli       cmd/cli.go
-          GOOS=linux   GOARCH=loong64 go build -ldflags "$flag" -o build/linux-loong64/kaf-cli     cmd/cli.go
-          GOOS=darwin  GOARCH=amd64   go build -ldflags "$flag" -o build/darwin-amd64/kaf-cli      cmd/cli.go
-          GOOS=darwin  GOARCH=arm64   go build -ldflags "$flag" -o build/darwin-arm64/kaf-cli      cmd/cli.go
-          GOOS=wasip1  GOARCH=wasm    go build -ldflags "$flag" -o build/wasm-wasip1/kaf-cli.wasm  cmd/cli.go
+          GOOS=linux   GOARCH=amd64   go build -ldflags "$flag" -o build/linux-amd64/kaf-cli       cmd/cli/main.go
+          GOOS=linux   GOARCH=arm64   go build -ldflags "$flag" -o build/linux-arm64/kaf-cli       cmd/cli/main.go
+          GOOS=linux   GOARCH=loong64 go build -ldflags "$flag" -o build/linux-loong64/kaf-cli     cmd/cli/main.go
+          GOOS=darwin  GOARCH=amd64   go build -ldflags "$flag" -o build/darwin-amd64/kaf-cli      cmd/cli/main.go
+          GOOS=darwin  GOARCH=arm64   go build -ldflags "$flag" -o build/darwin-arm64/kaf-cli      cmd/cli/main.go
+          GOOS=wasip1  GOARCH=wasm    go build -ldflags "$flag" -o build/wasm-wasip1/kaf-cli.wasm  cmd/cli/main.go
           ${GOBIN}/rsrc -arch amd64 -manifest kaf-cli.exe.manifest -ico ./assets/kaf.ico -o kaf-cli.syso
-          GOOS=windows GOARCH=386     go build -ldflags "$flag" -o build/windows-386/kaf-cli.exe   cmd/cli.go
-          GOOS=windows GOARCH=amd64   go build -ldflags "$flag" -o build/windows-amd64/kaf-cli.exe cmd/cli.go
+          GOOS=windows GOARCH=386     go build -ldflags "$flag" -o build/windows-386/kaf-cli.exe   cmd/cli/main.go
+          GOOS=windows GOARCH=amd64   go build -ldflags "$flag" -o build/windows-amd64/kaf-cli.exe cmd/cli/main.go
 
       - name: compression zip
         run: |

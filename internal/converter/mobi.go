@@ -1,14 +1,30 @@
-package kafcli
+package converter
 
 import (
 	"fmt"
-	"github.com/766b/mobi"
 	"time"
+
+	"github.com/766b/mobi"
+	"github.com/ystyle/kaf-cli/internal/model"
 )
 
-type MobiConverter struct{}
+type MobiConverter struct {
+	HTMLPStart     string // MOBI专属段落标签
+	HTMLPEnd       string
+	HTMLTitleStart string
+	HTMLTitleEnd   string
+}
 
-func (convert MobiConverter) Build(book Book) error {
+func NewMobiConverter() *MobiConverter {
+	return &MobiConverter{
+		HTMLPStart:     `<p class="content">`,
+		HTMLPEnd:       "</p>",
+		HTMLTitleStart: `<h3 class="title">`,
+		HTMLTitleEnd:   "</h3>",
+	}
+}
+
+func (convert MobiConverter) Build(book model.Book) error {
 	fmt.Println("使用第三方库生成mobi, 不保证所有样式都能正常显示")
 	fmt.Println("正在生成mobi...")
 	start := time.Now()

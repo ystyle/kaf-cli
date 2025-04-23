@@ -5,8 +5,8 @@ require (
 	github.com/bmaupin/go-epub v1.1.0
 	github.com/leotaku/mobi v0.0.0-20220405163106-82e29bde7964
 	github.com/ystyle/google-analytics v0.0.0-20210425064301-a7f754dd0649
-	golang.org/x/net v0.17.0
-	golang.org/x/text v0.13.0
+	golang.org/x/net v0.39.0
+	golang.org/x/text v0.24.0
 )
 
 require (
@@ -15,4 +15,6 @@ require (
 	github.com/vincent-petithory/dataurl v0.0.0-20191104211930-d1553a71de50 // indirect
 )
 
-go 1.21
+go 1.23.0
+
+toolchain go1.24.2
