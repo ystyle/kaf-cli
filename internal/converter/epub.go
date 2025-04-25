@@ -3,6 +3,8 @@ package converter
 import (
 	"bytes"
 	"fmt"
+	"io"
+	"log"
 	"os"
 	"path/filepath"
 	"time"
@@ -43,6 +45,7 @@ func (convert EpubConverter) wrapTitle(title, content string) string {
 }
 
 func (convert EpubConverter) Build(book model.Book) error {
+	log.Default().SetOutput(io.Discard)
 	fmt.Println("正在生成epub")
 	start := time.Now()
 	// 写入样式

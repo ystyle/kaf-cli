@@ -2,14 +2,14 @@ github.com/766b/mobi v0.0.0-20200528201125-c87aa9e3c890 h1:5EBpQM2h7OdIRR1jw1Iyp
 github.com/766b/mobi v0.0.0-20200528201125-c87aa9e3c890/go.mod h1:ut/OVrYa64AAfis3e0GO4uEb8mwXSJoqAqnIMQd24HQ=
 github.com/gabriel-vasile/mimetype v1.4.9 h1:5k+WDwEsD9eTLL8Tz3L0VnmVh9QxGjRmjBvAG7U/oYY=
 github.com/gabriel-vasile/mimetype v1.4.9/go.mod h1:WnSQhFKJuBlRyLiKohA/2DtIlPFAbguNaG7QCHcyGok=
-github.com/go-shiori/go-epub v1.2.1 h1:+K/WxrvmfFQY69cpryiObrT6X7WhkwpqhHY65AHs2Rg=
-github.com/go-shiori/go-epub v1.2.1/go.mod h1:3rCTODnigEgy2j3ksndClrGT9h/dcz3js9q4yPX7hf8=
 github.com/gofrs/uuid/v5 v5.3.2 h1:2jfO8j3XgSwlz/wHqemAEugfnTlikAYHhnqQ8Xh4fE0=
 github.com/gofrs/uuid/v5 v5.3.2/go.mod h1:CDOjlDMVAtN56jqyRUZh58JT31Tiw7/oQyEXZV+9bD8=
 github.com/leotaku/mobi v0.5.0 h1:amQGGPb0weyjgB7BA7oAeN2yo0dWzxr6QwIgDaNiXlI=
 github.com/leotaku/mobi v0.5.0/go.mod h1:n1qdG5Tf5pOuJUb1Vck1Qa9sU25JS1XJgUMDYzPWQ7c=
 github.com/vincent-petithory/dataurl v1.0.0 h1:cXw+kPto8NLuJtlMsI152irrVw9fRDX8AbShPRpg2CI=
 github.com/vincent-petithory/dataurl v1.0.0/go.mod h1:FHafX5vmDzyP+1CQATJn7WFKc9CvnvxyvZy6I1MrG/U=
+github.com/ystyle/go-epub v0.0.0-20250425133851-dba4e6a949ec h1:CNrHnvNcFdT41BDBKvlZ+WIDv5Ye/rQdZiOorWX67Hs=
+github.com/ystyle/go-epub v0.0.0-20250425133851-dba4e6a949ec/go.mod h1:3q72SS/xhacgTr51ykGWJGSh3/l2lpB10CcLW+gO3Rw=
 github.com/ystyle/google-analytics v0.0.0-20210425064301-a7f754dd0649 h1:2uiow2Fw91jCIiYwMKvPF/lUMMdtVjgVpwqTcbC0fPU=
 github.com/ystyle/google-analytics v0.0.0-20210425064301-a7f754dd0649/go.mod h1:j2L81Z+juG+93VLJWQL25LeFnI2LygARlF/YbdAo2vg=
 github.com/yuin/goldmark v1.4.13/go.mod h1:6yULJ656Px+3vBD8DxQVa3kxgyrAnzto9xy5taEt/CY=

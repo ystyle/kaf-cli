@@ -15,6 +15,7 @@ require (
 	github.com/vincent-petithory/dataurl v1.0.0 // indirect
 )
 
-go 1.23.0
+replace github.com/go-shiori/go-epub v1.2.1 => github.com/ystyle/go-epub v0.0.0-20250425133851-dba4e6a949ec
 
-toolchain go1.24.2
+go 1.23.1
+
