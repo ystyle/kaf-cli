@@ -16,7 +16,7 @@ var (
 
 const (
 	VolumeMatch      = "^第[0-9一二三四五六七八九十零〇百千两 ]+[卷部]"
-	DefaultMatchTips = "^第[0-9一二三四五六七八九十零〇百千两 ]+[章回节集卷部]|^[Ss]ection.{1,20}$|^[Cc]hapter.{1,20}$|^[Pp]age.{1,20}$|^\\d{1,4}$|^\\d+、|^引子$|^楔子$|^章节目录|^章节|^序章"
+	DefaultMatchTips = "^第[0-9一二三四五六七八九十零〇百千两 ]+[章回节集卷部]|^[Ss]ection.{1,20}$|^[Cc]hapter.{1,20}$|^[Pp]age.{1,20}$|^\\d{1,4}$|^\\d+、$|^引子$|^楔子$|^章节目录|^章节|^序章"
 	Tutorial         = `本书由kaf-cli生成: <br/>
 制作教程: <a href='https://ystyle.top/2019/12/31/txt-converto-epub-and-mobi/'>https://ystyle.top/2019/12/31/txt-converto-epub-and-mobi</a>
 `

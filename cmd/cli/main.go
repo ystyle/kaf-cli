@@ -52,6 +52,7 @@ func printHelp(version string) {
 	fmt.Println("简洁模式: \t把文件拖放到kaf-cli上")
 	fmt.Println("命令行简单模式: kaf-cli ebook.txt")
 	fmt.Println("\n以下为kaf-cli的全部参数")
+	NewBookArgs()
 	flag.PrintDefaults()
 	if runtime.GOOS == "windows" {
 		time.Sleep(time.Second * 10)
