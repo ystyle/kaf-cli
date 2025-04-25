@@ -7,7 +7,7 @@ import (
 	"path/filepath"
 	"time"
 
-	"github.com/bmaupin/go-epub"
+	"github.com/go-shiori/go-epub"
 	"github.com/ystyle/kaf-cli/internal/model"
 	"github.com/ystyle/kaf-cli/internal/utils"
 )
@@ -54,7 +54,10 @@ func (convert EpubConverter) Build(book model.Book) error {
 	}()
 
 	// Create a ne EPUB
-	e := epub.NewEpub(book.Bookname)
+	e, err := epub.NewEpub(book.Bookname)
+	if err != nil {
+		return fmt.Errorf("创建小说文件失败")
+	}
 	e.SetLang(book.Lang)
 	// Set the author
 	e.SetAuthor(book.Author)
