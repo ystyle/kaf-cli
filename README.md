@@ -9,7 +9,7 @@
 - 自动识别书名和章节(示例中所有用法都会自动识别)
 - 自动识别字符编码(自动解决中文乱码)
 - 自定义章节标题识别规则
-- 自定义卷的标题识别规则(卷的识别需要在标题识别规则里能识别出来)
+- 自定义卷的标题识别规则
 - 自动给章节正文生成加粗居中的标题
 - 自定义标题对齐方式
 - 段落自动识别
@@ -20,7 +20,7 @@
 - 自定义书籍语言
 - epub格式支持嵌入字体
 - 知轩藏书格式文件名会自动提取书名和作者, 例: `《希灵帝国》（校对版全本）作者：远瞳.txt`
-- 超快速(130章/s以上速度, 4000章30s不到)
+- 超快速(epub格式生成300章/s以上速度, 4000章15s不到)
 - 自动转为mobi格式
 
 ### 下载
@@ -48,6 +48,7 @@
 
 ```text
 Usage of kaf-cli:
+```shell
   -align string
         标题对齐方式: left、center、righ。环境变量KAF_CLI_ALIGN可修改默认值 (default "center")
   -author string
@@ -67,7 +68,7 @@ Usage of kaf-cli:
   -font string
         嵌入字体, 之后epub的正文都将使用该字体
   -format string
-        书籍格式: all、epub、mobi、azw3。环境变量KAF_CLI_FORMAT可修改默认值 (default "all")
+        书籍格式: all、epub、mobi、azw3。环境变量KAF_CLI_FORMAT可修改默认值 (default "epub")
   -indent uint
         段落缩进字数 (default 2)
   -lang string
@@ -85,7 +86,7 @@ Usage of kaf-cli:
   -unknow-title string
         未知章节默认名称 (default "章节正文")
   -volume-match string
-        卷匹配规则 (default "^第[0-9一二三四五六七八九十零〇百千两 ]+[卷部]")
+        卷匹配规则,设置为false可以禁用卷识别 (default "^第[0-9一二三四五六七八九十零〇百千两 ]+[卷部]")
 ```
 
 >PS: 在darwin(mac、osx)上`-tips`参数要设置为false的方法 `kaf-cli -filename 小说.txt -tips=0`
@@ -114,6 +115,9 @@ kaf-cli ~/全职法师.txt
 >以下全部示例都可以自动识别，不需要自己设定标题格式了， 一般用上用上面的例子就行了
 
 >规则支持[正则表达式](http://deerchao.net/tutorials/regex/regex.htm)， 要自定义标题格式参考以下几个例子, 以下例子小说都在D盘
+
+快速入门
+>注意`.`是指任意字，`{1,8}`里边的数值代表1-8个字, `\d+`是指纯数字，`\w`是指中英文的字
 
 
 

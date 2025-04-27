@@ -83,21 +83,26 @@ func Parse(book *model.Book) error {
 		if len(line) == 0 {
 			continue
 		}
-		// 处理标题
-		if utf8.RuneCountInString(line) <= int(book.Max) &&
-			(book.Reg.MatchString(line) || book.VolumeReg.MatchString(line)) {
-			if title == "" {
-				title = book.UnknowTitle
+		// 处理标题（优先匹配卷）
+		if utf8.RuneCountInString(line) <= int(book.Max) {
+			isVolume := book.VolumeReg.MatchString(line)
+			isChapter := book.Reg.MatchString(line)
+
+			if isVolume || isChapter {
+				if title == "" {
+					title = book.UnknowTitle
+				}
+				if content.Len() > 0 || title != book.UnknowTitle {
+					contentList = append(contentList, model.Section{
+						Title:   title,
+						Content: content.String(),
+					})
+				}
+				title = line
+				content.Reset()
+				continue
 			}
-			if content.Len() > 0 || title != book.UnknowTitle {
-				contentList = append(contentList, model.Section{
-					Title:   title,
-					Content: content.String(),
-				})
-			}
-			title = line
-			content.Reset()
-			continue
+
 		}
 		utils.AddPart(&content, line)
 	}
@@ -121,6 +126,12 @@ func Parse(book *model.Book) error {
 			}
 			temp := section
 			volumeSection = &temp
+		} else if strings.HasPrefix(section.Title, "完本感言") || strings.HasPrefix(section.Title, "番外") {
+			if volumeSection != nil {
+				sectionList = append(sectionList, *volumeSection)
+				volumeSection = nil
+			}
+			sectionList = append(sectionList, section)
 		} else {
 			if volumeSection == nil {
 				sectionList = append(sectionList, section)
