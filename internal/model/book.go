@@ -17,6 +17,7 @@ var (
 const (
 	VolumeMatch      = "^第[0-9一二三四五六七八九十零〇百千两 ]+[卷部]"
 	DefaultMatchTips = "^第[0-9一二三四五六七八九十零〇百千两 ]+[章回节集幕卷部]|^[Ss]ection.{1,20}$|^[Cc]hapter.{1,20}$|^[Pp]age.{1,20}$|^\\d{1,4}$|^\\d+、$|^引子$|^楔子$|^章节目录|^章节|^序章|^最终章 \\w{1,20}$|^番外\\d?\\w{0,20}|^完本感言.{0,4}$"
+	DefaultExclusion = "^第[0-9一二三四五六七八九十零〇百千两 ]+(部门|部队|部属|部分|部件|部落|部.*：$)"
 	Tutorial         = `本书由kaf-cli生成: <br/>
 制作教程: <a href='https://ystyle.top/2019/12/31/txt-converto-epub-and-mobi/'>https://ystyle.top/2019/12/31/txt-converto-epub-and-mobi</a>
 `
@@ -31,31 +32,33 @@ func NewBookSimple(filename string) (*Book, error) {
 }
 
 type Book struct {
-	Filename       string    // 目录
-	Bookname       string    // 书名
-	Author         string    // 作者
-	SectionList    []Section // 章节
-	Match          string    // 正则
-	VolumeMatch    string    // 卷匹配规则
-	Max            uint      // 标题最大字数
-	Indent         uint      // 段落缩进字段
-	Align          string    // 标题对齐方式
-	UnknowTitle    string    // 未知章节名称
-	Cover          string    // 封面图片
-	CoverOrlyColor string    // 生成封面图片的颜色
-	CoverOrlyIdx   int       // 生成封面图片的动物
-	Font           string    // 嵌入字体
-	Bottom         string    // 段阿落间距
-	LineHeight     string    // 行高
-	Tips           bool      // 是否添加教程文本
-	Lang           string    // 设置语言
-	Out            string    // 输出文件名
-	Format         string    // 书籍格式
-	Decoder        *encoding.Decoder
-	PageStylesFile string
-	Reg            *regexp.Regexp
-	VolumeReg      *regexp.Regexp
-	Version        string
+	Filename         string    // 目录
+	Bookname         string    // 书名
+	Author           string    // 作者
+	SectionList      []Section // 章节
+	Match            string    // 正则
+	VolumeMatch      string    // 卷匹配规则
+	ExclusionPattern string    // 用户自定义的排除规则（正则）
+	Max              uint      // 标题最大字数
+	Indent           uint      // 段落缩进字段
+	Align            string    // 标题对齐方式
+	UnknowTitle      string    // 未知章节名称
+	Cover            string    // 封面图片
+	CoverOrlyColor   string    // 生成封面图片的颜色
+	CoverOrlyIdx     int       // 生成封面图片的动物
+	Font             string    // 嵌入字体
+	Bottom           string    // 段阿落间距
+	LineHeight       string    // 行高
+	Tips             bool      // 是否添加教程文本
+	Lang             string    // 设置语言
+	Out              string    // 输出文件名
+	Format           string    // 书籍格式
+	Decoder          *encoding.Decoder
+	PageStylesFile   string
+	Reg              *regexp.Regexp
+	VolumeReg        *regexp.Regexp
+	ExclusionReg     *regexp.Regexp // 动态生成的正则，用于排除无效标题
+	Version          string
 }
 
 type Section struct {
@@ -85,6 +88,7 @@ func SetDefault(book *Book) {
 	book.Lang = utils.DefaultString(book.Lang, utils.GetEnv("KAF_CLI_LANG", "zh"))
 	book.Format = utils.DefaultString(book.Format, utils.GetEnv("KAF_CLI_FORMAT", "all"))
 	book.CoverOrlyIdx = utils.DefalutInt(book.CoverOrlyIdx, -1)
+	book.ExclusionPattern = utils.DefaultString(book.ExclusionPattern, DefaultExclusion) // 默认排除规则
 }
 
 func (book *Book) ToString() {

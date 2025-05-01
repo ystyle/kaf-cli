@@ -87,8 +87,12 @@ func Parse(book *model.Book) error {
 		if utf8.RuneCountInString(line) <= int(book.Max) {
 			isVolume := book.VolumeReg.MatchString(line)
 			isChapter := book.Reg.MatchString(line)
+			isExclusion := false
+			if book.ExclusionReg != nil && book.ExclusionReg.MatchString(line) {
+				isExclusion = true
+			}
 
-			if isVolume || isChapter {
+			if !isExclusion && (isVolume || isChapter) {
 				if title == "" {
 					title = book.UnknowTitle
 				}
@@ -102,7 +106,6 @@ func Parse(book *model.Book) error {
 				content.Reset()
 				continue
 			}
-
 		}
 		utils.AddPart(&content, line)
 	}

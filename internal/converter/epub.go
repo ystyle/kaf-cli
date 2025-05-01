@@ -84,7 +84,7 @@ font-family: "embedfont";
 `, fontfile)
 	}
 
-	err = os.WriteFile(pageStylesFile, []byte(fmt.Sprintf(epubcss, book.Align, book.Bottom, book.Indent, excss)), 0666)
+	err = os.WriteFile(pageStylesFile, fmt.Appendf(nil, epubcss, book.Align, book.Bottom, book.Indent, excss), 0666)
 	if err != nil {
 		return fmt.Errorf("无法写入样式文件: %w", err)
 	}

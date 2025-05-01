@@ -28,6 +28,7 @@ func NewBookArgs() *model.Book {
 	flag.StringVar(&book.Author, "author", "YSTYLE", "作者")
 	flag.StringVar(&book.Match, "match", "", "匹配标题的正则表达式, 不写可以自动识别, 如果没生成章节就参考教程。例: -match 第.{1,8}章 表示第和章字之间可以有1-8个任意文字")
 	flag.StringVar(&book.VolumeMatch, "volume-match", model.VolumeMatch, "卷匹配规则,设置为false可以禁用卷识别")
+	flag.StringVar(&book.ExclusionPattern, "exclude", model.DefaultExclusion, "排除无效章节/卷的正则表达式")
 	flag.StringVar(&book.UnknowTitle, "unknow-title", "章节正文", "未知章节默认名称")
 	flag.StringVar(&book.Cover, "cover", "cover.png", "封面图片可为: 本地图片, 和orly。 设置为orly时生成orly风格的封面, 需要连接网络。")
 	flag.StringVar(&book.CoverOrlyColor, "cover-orly-color", "", "orly封面的主题色, 可以为1-16和hex格式的颜色代码, 不填时随机")
@@ -76,6 +77,7 @@ func main() {
 			fmt.Printf("错误: %s\n", err.Error())
 			os.Exit(1)
 		}
+		fmt.Println(err)
 		printHelp(version)
 		os.Exit(1)
 	}

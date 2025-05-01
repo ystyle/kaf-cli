@@ -94,5 +94,10 @@ func compileRegex(book *model.Book) error {
 		return fmt.Errorf("生成匹配规则出错: %s\n%s\n", book.VolumeMatch, err.Error())
 	}
 	book.VolumeReg = reg2
+
+	if book.ExclusionPattern != "" && book.ExclusionPattern != "false" {
+		book.ExclusionReg = regexp.MustCompile(book.ExclusionPattern)
+	}
+
 	return nil
 }
