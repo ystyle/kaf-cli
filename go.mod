@@ -12,10 +12,13 @@ require (
 require (
 	github.com/gabriel-vasile/mimetype v1.4.9 // indirect
 	github.com/gofrs/uuid/v5 v5.3.2 // indirect
+	github.com/google/uuid v1.6.0 // indirect
+	github.com/mark3labs/mcp-go v0.27.0 // indirect
+	github.com/spf13/cast v1.7.1 // indirect
 	github.com/vincent-petithory/dataurl v1.0.0 // indirect
+	github.com/yosida95/uritemplate/v3 v3.0.2 // indirect
 )
 
 replace github.com/go-shiori/go-epub v1.2.1 => github.com/ystyle/go-epub v0.0.0-20250425133851-dba4e6a949ec
 
 go 1.23.1
-

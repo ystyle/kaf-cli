@@ -136,6 +136,15 @@ d:/kaf-cli.exe -filename d:/ebbok.txt -match "Section \d+"
 d:/kaf-cli.exe -filename d:/ebbok.txt -match "Chapter .{1,8}"
 ```
 
+### MCP 版本使用说明
+>以cherry studio为例
+- 1. 下载kaf-mcp, 并解压
+- 2. 配置mcp
+   - 命令这里填上面下载到的kaf-mcp命令的路径
+   - 在环境变量里添加`KAF_DIR=xxx`, xxx换成txt小说所在的目录，转换后的小说也会放这里
+   ![](assets/mcp-cherry-studio-config.png)
+- 3. 在ai对话里转换小说
+   ![](assets/mcp-cherry-studio-config.png)
 
 ### 在任意位置执行命令
 - windows

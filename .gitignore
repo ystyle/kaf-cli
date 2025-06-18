@@ -7,3 +7,6 @@
 *.zio
 kaf-cli-*
 samples
+.aider*
+kaf-mcp
+main
