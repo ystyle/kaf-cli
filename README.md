@@ -138,9 +138,9 @@ d:/kaf-cli.exe -filename d:/ebbok.txt -match "Chapter .{1,8}"
 
 ### MCP 版本使用说明
 >以cherry studio为例
-- 1. 下载kaf-mcp, 并解压
+- 1. 点击下载[kaf-mcp](https://github.com/ystyle/kaf-cli/releases?q=mcp-), 并解压, 复制kaf-mcp的路径
 - 2. 配置mcp
-   - 命令这里填上面下载到的kaf-mcp命令的路径
+   - 命令这里填上面的kaf-mcp命令的路径
    - 在环境变量里添加`KAF_DIR=xxx`, xxx换成txt小说所在的目录，转换后的小说也会放这里
    ![](assets/mcp-cherry-studio-config.png)
 - 3. 在ai对话里转换小说
