@@ -144,7 +144,7 @@ d:/kaf-cli.exe -filename d:/ebbok.txt -match "Chapter .{1,8}"
    - 在环境变量里添加`KAF_DIR=xxx`, xxx换成txt小说所在的目录，转换后的小说也会放这里
    ![](assets/mcp-cherry-studio-config.png)
 - 3. 在ai对话里转换小说
-   ![](assets/mcp-cherry-studio-config.png)
+   ![](assets/mcp-cherry-studio-use.png)
 
 ### 在任意位置执行命令
 - windows
