@@ -40,20 +40,20 @@ func (d *Dispatcher) Convert() error {
 	var convert Converter
 	// 生成epub
 	if isEpub {
-		convert = EpubConverter{}
+		convert = NewEpubConverter()
 		convert.Build(*d.Book)
 		fmt.Println()
 	}
 	// 生成azw3格式
 	if isAzw3 {
-		convert = Azw3Converter{}
+		convert = NewAzw3Converter()
 		// 生成kindle格式
 		convert.Build(*d.Book)
 	}
 	// 生成mobi格式
 	if isMobi {
 		if hasKinldegen == "" {
-			convert = MobiConverter{}
+			convert = NewMobiConverter()
 			convert.Build(*d.Book)
 		} else {
 			ConverToMobi(fmt.Sprintf("%s.epub", d.Book.Out), d.Book.Lang)
