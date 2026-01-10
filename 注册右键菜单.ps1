@@ -15,13 +15,12 @@ $currentpath = Split-Path -Parent $MyInvocation.MyCommand.Definition
 $ico_path = $currentpath + "\kaf-cli.exe"
 $exe_path = $currentpath + "\kaf-cli.exe" + ' "%1"'
 
-# 配置右键菜单
-New-Item -Force -Path Registry::HKEY_CLASSES_ROOT\txtfile\shell\使用kaf-cli转换
-New-ItemProperty -Force -Path Registry::HKEY_CLASSES_ROOT\txtfile\shell\使用kaf-cli转换 -Name Icon -PropertyType String -Value $ico_path
+# 注册右键菜单（使用 HKEY_CURRENT_USER，不需要管理员权限，Win10/Win11 通用）
+New-Item -Force -Path Registry::HKEY_CURRENT_USER\Software\Classes\txtfile\shell\使用kaf-cli转换
+New-ItemProperty -Force -Path Registry::HKEY_CURRENT_USER\Software\Classes\txtfile\shell\使用kaf-cli转换 -Name Icon -PropertyType String -Value $ico_path
 
-New-Item -Force -Path Registry::HKEY_CLASSES_ROOT\txtfile\shell\使用kaf-cli转换\command
-New-ItemProperty -Force -Path Registry::HKEY_CLASSES_ROOT\txtfile\shell\使用kaf-cli转换\command -Name "(default)" -PropertyType String -Value $exe_path
+New-Item -Force -Path Registry::HKEY_CURRENT_USER\Software\Classes\txtfile\shell\使用kaf-cli转换\command
+New-ItemProperty -Force -Path Registry::HKEY_CURRENT_USER\Software\Classes\txtfile\shell\使用kaf-cli转换\command -Name "(default)" -PropertyType String -Value $exe_path
 
 echo "注册右键菜单成功!"
 pause
- 
