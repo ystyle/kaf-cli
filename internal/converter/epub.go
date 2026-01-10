@@ -7,6 +7,7 @@ import (
 	"log"
 	"os"
 	"path/filepath"
+	"regexp"
 	"time"
 
 	"github.com/go-shiori/go-epub"
@@ -29,19 +30,87 @@ func NewEpubConverter() *EpubConverter {
 		HTMLTitleStart: `<h3 class="title">`,
 		HTMLTitleEnd:   "</h3>",
 		CSSContent: `
-            .title {text-align: %s}
+            h3.title {
+                text-align: %s;
+                font-size: 1.8em;
+                margin: 1em 0;
+                border-bottom: 2px solid #ccc;
+            }
+            h3.title span.chapter-number {
+                display: block;
+                font-size: 0.65em;
+            }
             .content { margin-bottom: %s; text-indent: %dem; %s }
         `,
 	}
 }
 
-func (convert EpubConverter) wrapTitle(title, content string) string {
+func (convert EpubConverter) wrapTitle(title, content string, separateNumber bool) string {
 	var buff bytes.Buffer
-	buff.WriteString(convert.HTMLTitleStart)
-	buff.WriteString(title)
-	buff.WriteString(convert.HTMLTitleEnd)
+
+	if separateNumber {
+		// 尝试分离章节序号和标题
+		number, text := parseChapterTitle(title)
+		buff.WriteString(convert.HTMLTitleStart)
+		if number != "" {
+			// 有序号，将序号和标题分开显示
+			buff.WriteString(fmt.Sprintf(`<span class="chapter-number">%s</span>`, number))
+			if text != "" {
+				buff.WriteString(text)
+			}
+		} else {
+			// 无序号，直接显示标题
+			buff.WriteString(title)
+		}
+		buff.WriteString(convert.HTMLTitleEnd)
+	} else {
+		// 不分离，直接显示标题
+		buff.WriteString(convert.HTMLTitleStart)
+		buff.WriteString(title)
+		buff.WriteString(convert.HTMLTitleEnd)
+	}
 	buff.WriteString(content)
 	return buff.String()
+}
+
+// parseChapterTitle 解析章节标题，返回序号和标题
+// 支持的格式：
+//   "第一章 标题" -> number="第一章", text="标题"
+//   "第1章 标题" -> number="第1章", text="标题"
+//   "1. 标题" -> number="1.", text="标题"
+//   "一、标题" -> number="一、", text="标题"
+//   "引子" -> number="引子", text=""
+//   "卷名" -> number="", text="卷名"（没有匹配到序号）
+func parseChapterTitle(title string) (number, text string) {
+	// 匹配 "第X章/回/节/集" 格式
+	re := regexp.MustCompile(`^(第[0-9一二三四五六七八九十零〇百千两 ]+[章回节集])\s*(.*)$`)
+	if matches := re.FindStringSubmatch(title); matches != nil {
+		return matches[1], matches[2]
+	}
+
+	// 匹配 "数字." 或 "数字、" 格式（使用字符串拼接来支持中文顿号）
+	re = regexp.MustCompile(`^(\d+[.` + string(rune(0x3001)) + `])\s*(.*)$`)
+	if matches := re.FindStringSubmatch(title); matches != nil {
+		return matches[1], matches[2]
+	}
+
+	// 匹配 "中文数字、" 格式
+	re = regexp.MustCompile(`^([一二三四五六七八九十]+[.` + string(rune(0x3001)) + `])\s*(.*)$`)
+	if matches := re.FindStringSubmatch(title); matches != nil {
+		return matches[1], matches[2]
+	}
+
+	// 匹配特殊章节名（引子、楔子、序章等）
+	re = regexp.MustCompile(`^(引子|楔子|序章|最终章|完本感言|番外)\s*(.*)$`)
+	if matches := re.FindStringSubmatch(title); matches != nil {
+		if matches[2] != "" {
+			return matches[1], matches[2]
+		}
+		return matches[1], ""
+	}
+
+	// 没有匹配到序号格式，返回空序号
+	return "", title
 }
 
 func (convert EpubConverter) Build(book model.Book) error {
@@ -104,7 +173,7 @@ font-family: "embedfont";
 	for _, section := range book.SectionList {
 		if len(section.Sections) > 0 {
 			internalFilename, _ := e.AddSection(
-				convert.wrapTitle(section.Title, section.Content),
+				convert.wrapTitle(section.Title, section.Content, book.SeparateChapterNumber),
 				section.Title,
 				"",
 				css,
@@ -112,14 +181,14 @@ font-family: "embedfont";
 			for _, subsecton := range section.Sections {
 				e.AddSubSection(
 					internalFilename,
-					convert.wrapTitle(subsecton.Title, subsecton.Content),
+					convert.wrapTitle(subsecton.Title, subsecton.Content, book.SeparateChapterNumber),
 					subsecton.Title,
 					"",
 					css,
 				)
 			}
 		} else {
-			e.AddSection(convert.wrapTitle(section.Title, section.Content), section.Title, "", css)
+			e.AddSection(convert.wrapTitle(section.Title, section.Content, book.SeparateChapterNumber), section.Title, "", css)
 		}
 	}
 
