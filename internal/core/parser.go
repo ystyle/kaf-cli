@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"io"
 	"os"
+	"regexp"
 	"strings"
 	"time"
 	"unicode/utf8"
@@ -48,6 +49,71 @@ func readBuffer(book *model.Book, filename string) *bufio.Reader {
 	}
 }
 
+// sanitizeHTMLTags 智能处理 HTML 标签
+// 保留 epub 支持的标签（如 img, br, hr 等），转义其他标签
+func sanitizeHTMLTags(line string) string {
+	// 快速检查：如果没有 < 符号，直接返回
+	if !strings.Contains(line, "<") {
+		return line
+	}
+
+	// 定义允许的标签（EPUB 3.0 支持的常用标签）
+	// 只保留最常用的标签以提升性能
+	allowedTags := []string{
+		"img", "br", "hr", // 单标签（最常用）
+		"p", "span", "div",
+		"b", "i", "u", "s", "strong", "em",
+		"a", "table", "tr", "td", "th",
+	}
+
+	// 构建正则表达式来匹配允许的标签
+	var tagPatterns []string
+	for _, tag := range allowedTags {
+		tagPatterns = append(tagPatterns, fmt.Sprintf(`<%s\b[^>]*>`, tag))
+		tagPatterns = append(tagPatterns, fmt.Sprintf(`</%s>`, tag))
+		tagPatterns = append(tagPatterns, fmt.Sprintf(`<%s\b[^>]*/>`, tag))
+	}
+
+	pattern := strings.Join(tagPatterns, "|")
+	re := regexp.MustCompile(pattern)
+
+	// 找到所有匹配的标签
+	matches := re.FindAllStringIndex(line, -1)
+
+	// 如果没有匹配到任何标签，直接全部转义
+	if len(matches) == 0 {
+		line = strings.ReplaceAll(line, "<", "&lt;")
+		line = strings.ReplaceAll(line, ">", "&gt;")
+		return line
+	}
+
+	// 有匹配的标签，需要保护
+	var result strings.Builder
+	lastEnd := 0
+
+	for _, match := range matches {
+		start, end := match[0], match[1]
+
+		// 转义匹配标签之前的文本
+		segment := line[lastEnd:start]
+		segment = strings.ReplaceAll(segment, "<", "&lt;")
+		segment = strings.ReplaceAll(segment, ">", "&gt;")
+		result.WriteString(segment)
+
+		// 保留标签本身
+		result.WriteString(line[start:end])
+		lastEnd = end
+	}
+
+	// 处理最后一部分
+	segment := line[lastEnd:]
+	segment = strings.ReplaceAll(segment, "<", "&lt;")
+	segment = strings.ReplaceAll(segment, ">", "&gt;")
+	result.WriteString(segment)
+
+	return result.String()
+}
+
 func Parse(book *model.Book) error {
 	if book == nil {
 		return fmt.Errorf("book参数不能为nil")
@@ -77,8 +143,8 @@ func Parse(book *model.Book) error {
 			return fmt.Errorf("读取文件出错: %w", err)
 		}
 		line = strings.TrimSpace(line)
-		line = strings.ReplaceAll(line, "<", "&lt;")
-		line = strings.ReplaceAll(line, ">", "&gt;")
+		// 智能处理 HTML 标签：保留 epub 支持的标签，转义其他标签
+		line = sanitizeHTMLTags(line)
 		// 空行直接跳过
 		if len(line) == 0 {
 			continue
