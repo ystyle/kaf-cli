@@ -32,33 +32,34 @@ func NewBookSimple(filename string) (*Book, error) {
 }
 
 type Book struct {
-	Filename         string    // 目录
-	Bookname         string    // 书名
-	Author           string    // 作者
-	SectionList      []Section // 章节
-	Match            string    // 正则
-	VolumeMatch      string    // 卷匹配规则
-	ExclusionPattern string    // 用户自定义的排除规则（正则）
-	Max              uint      // 标题最大字数
-	Indent           uint      // 段落缩进字段
-	Align            string    // 标题对齐方式
-	UnknowTitle      string    // 未知章节名称
-	Cover            string    // 封面图片
-	CoverOrlyColor   string    // 生成封面图片的颜色
-	CoverOrlyIdx     int       // 生成封面图片的动物
-	Font             string    // 嵌入字体
-	Bottom           string    // 段阿落间距
-	LineHeight       string    // 行高
-	Tips             bool      // 是否添加教程文本
-	Lang             string    // 设置语言
-	Out              string    // 输出文件名
-	Format           string    // 书籍格式
-	Decoder          *encoding.Decoder
-	PageStylesFile   string
-	Reg              *regexp.Regexp
-	VolumeReg        *regexp.Regexp
-	ExclusionReg     *regexp.Regexp // 动态生成的正则，用于排除无效标题
-	Version          string
+	Filename               string    // 目录
+	Bookname               string    // 书名
+	Author                 string    // 作者
+	SectionList            []Section // 章节
+	Match                  string    // 正则
+	VolumeMatch            string    // 卷匹配规则
+	ExclusionPattern       string    // 用户自定义的排除规则（正则）
+	Max                    uint      // 标题最大字数
+	Indent                 uint      // 段落缩进字段
+	Align                  string    // 标题对齐方式
+	UnknowTitle            string    // 未知章节名称
+	Cover                  string    // 封面图片
+	CoverOrlyColor         string    // 生成封面图片的颜色
+	CoverOrlyIdx           int       // 生成封面图片的动物
+	Font                   string    // 嵌入字体
+	Bottom                 string    // 段阿落间距
+	LineHeight             string    // 行高
+	Tips                   bool      // 是否添加教程文本
+	Lang                   string    // 设置语言
+	Out                    string    // 输出文件名
+	Format                 string    // 书籍格式
+	SeparateChapterNumber  bool      // 是否分离章节序号和标题样式
+	Decoder                *encoding.Decoder
+	PageStylesFile         string
+	Reg                    *regexp.Regexp
+	VolumeReg              *regexp.Regexp
+	ExclusionReg           *regexp.Regexp // 动态生成的正则，用于排除无效标题
+	Version                string
 }
 
 type Section struct {
