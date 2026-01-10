@@ -16,20 +16,34 @@ import (
 )
 
 type EpubConverter struct {
-	HTMLPStart     string // EPUB专属段落标签
-	HTMLPEnd       string
-	HTMLTitleStart string
-	HTMLTitleEnd   string
-	CSSContent     string
+	HTMLPStart       string // EPUB专属段落标签
+	HTMLPEnd         string
+	HTMLTitleStart   string
+	HTMLTitleEnd     string
+	HTMLVolumeStart  string
+	HTMLVolumeEnd    string
+	CSSContent       string
 }
 
 func NewEpubConverter() *EpubConverter {
 	return &EpubConverter{
-		HTMLPStart:     `<p class="content">`,
-		HTMLPEnd:       "</p>",
-		HTMLTitleStart: `<h3 class="title">`,
-		HTMLTitleEnd:   "</h3>",
+		HTMLPStart:      `<p class="content">`,
+		HTMLPEnd:        "</p>",
+		HTMLTitleStart:  `<h3 class="title">`,
+		HTMLTitleEnd:    "</h3>",
+		HTMLVolumeStart: `<h2 class="volume">`,
+		HTMLVolumeEnd:   "</h2>",
 		CSSContent: `
+            h2.volume {
+                text-align: center;
+                font-size: 2.2em;
+                margin: 1.5em 0 1em 0;
+                padding: 0.5em 0;
+                border-top: 3px double #666;
+                border-bottom: 3px double #666;
+                background: linear-gradient(to bottom, #f9f9f9, #ffffff);
+                font-weight: bold;
+            }
             h3.title {
                 text-align: %s;
                 font-size: 1.8em;
@@ -45,8 +59,17 @@ func NewEpubConverter() *EpubConverter {
 	}
 }
 
-func (convert EpubConverter) wrapTitle(title, content string, separateNumber bool) string {
+func (convert EpubConverter) wrapTitle(title, content string, separateNumber bool, isVolume bool) string {
 	var buff bytes.Buffer
+
+	if isVolume {
+		// 卷名使用专门的样式
+		buff.WriteString(convert.HTMLVolumeStart)
+		buff.WriteString(title)
+		buff.WriteString(convert.HTMLVolumeEnd)
+		buff.WriteString(content)
+		return buff.String()
+	}
 
 	if separateNumber {
 		// 尝试分离章节序号和标题
@@ -172,8 +195,9 @@ font-family: "embedfont";
 
 	for _, section := range book.SectionList {
 		if len(section.Sections) > 0 {
+			// 这是一个卷（包含子章节）
 			internalFilename, _ := e.AddSection(
-				convert.wrapTitle(section.Title, section.Content, book.SeparateChapterNumber),
+				convert.wrapTitle(section.Title, section.Content, book.SeparateChapterNumber, true),
 				section.Title,
 				"",
 				css,
@@ -181,14 +205,14 @@ font-family: "embedfont";
 			for _, subsecton := range section.Sections {
 				e.AddSubSection(
 					internalFilename,
-					convert.wrapTitle(subsecton.Title, subsecton.Content, book.SeparateChapterNumber),
+					convert.wrapTitle(subsecton.Title, subsecton.Content, book.SeparateChapterNumber, false),
 					subsecton.Title,
 					"",
 					css,
 				)
 			}
 		} else {
-			e.AddSection(convert.wrapTitle(section.Title, section.Content, book.SeparateChapterNumber), section.Title, "", css)
+			e.AddSection(convert.wrapTitle(section.Title, section.Content, book.SeparateChapterNumber, false), section.Title, "", css)
 		}
 	}
 
