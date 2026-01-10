@@ -176,6 +176,15 @@ font-family: "embedfont";
 `, fontfile)
 	}
 
+	// 追加用户自定义 CSS
+	if book.CustomCSSFile != "" {
+		customCSS, err := os.ReadFile(book.CustomCSSFile)
+		if err != nil {
+			return fmt.Errorf("读取自定义CSS文件失败: %w", err)
+		}
+		epubcss += string(customCSS)
+	}
+
 	err = os.WriteFile(pageStylesFile, fmt.Appendf(nil, epubcss, book.Align, book.Bottom, book.Indent, excss), 0666)
 	if err != nil {
 		return fmt.Errorf("无法写入样式文件: %w", err)

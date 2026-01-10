@@ -54,6 +54,7 @@ type Book struct {
 	Out                    string    // 输出文件名
 	Format                 string    // 书籍格式
 	SeparateChapterNumber  bool      // 是否分离章节序号和标题样式
+	CustomCSSFile          string    // 用户自定义 CSS 文件路径
 	Decoder                *encoding.Decoder
 	PageStylesFile         string
 	Reg                    *regexp.Regexp

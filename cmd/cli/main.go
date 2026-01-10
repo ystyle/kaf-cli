@@ -44,6 +44,7 @@ func NewBookArgs() *model.Book {
 	flag.StringVar(&book.Out, "out", "", "输出文件名，不需要包含格式后缀")
 	flag.BoolVar(&book.Tips, "tips", true, "添加本软件教程")
 	flag.BoolVar(&book.SeparateChapterNumber, "separate-chapter-number", false, "是否分离章节序号和标题样式（序号单独一行显示）")
+	flag.StringVar(&book.CustomCSSFile, "custom-css-file", "", "自定义 CSS 文件路径，用于覆盖默认样式")
 	flag.Parse()
 	return &book
 }
