@@ -11,6 +11,10 @@
 - 自定义章节标题识别规则
 - 自定义卷的标题识别规则
 - 自动给章节正文生成加粗居中的标题
+- 卷名使用精美的双线边框样式
+- 章节序号和标题分离显示（可选）
+- 自定义 CSS 样式支持
+- 智能 HTML 标签处理（保留 epub 支持的标签，转义其他标签）
 - 自定义标题对齐方式
 - 段落自动识别
 - 段落自动缩进
@@ -63,6 +67,10 @@ Usage of kaf-cli:
         orly封面的主题色, 可以为1-16和hex格式的颜色代码, 不填时随机
   -cover-orly-idx int
         orly封面的动物, 可以为0-41, 不填时随机, 具体图案可以查看: https://orly.nanmu.me (default -1)
+  -custom-css-file string
+        自定义 CSS 文件路径，用于覆盖默认样式
+  -exclude string
+        排除无效章节/卷的正则表达式 (default "^第[0-9一二三四五六七八九十零〇百千两 ]+(部门|部队|部属|部分|部件|部落|部.*：$)")
   -filename string
         txt 文件名
   -font string
@@ -81,6 +89,8 @@ Usage of kaf-cli:
         标题最大字数 (default 35)
   -out string
         输出文件名，不需要包含格式后缀
+  -separate-chapter-number
+        是否分离章节序号和标题样式（序号单独一行显示）
   -tips
         添加本软件教程 (default true)
   -unknow-title string
@@ -110,6 +120,53 @@ kaf-cli -author 乱 -filename ~/全职法师.txt
 # 命令行的简单模式（功能和拖拽模式一样）
 kaf-cli ~/全职法师.txt
 ```
+
+### 自定义 CSS 样式
+
+kaf-cli 支持通过 CSS 文件自定义样式，可以覆盖默认的样式设置。
+
+#### 可用的 CSS 类名
+
+- `h2.volume` - 卷名样式
+- `h3.title` - 章节标题样式
+- `h3.title span.chapter-number` - 章节序号样式
+- `.content` - 正文段落样式
+- `body` - 整体样式
+
+#### 使用示例
+
+1. 创建一个 CSS 文件（如 `mystyle.css`）：
+```css
+/* 修改卷名样式 */
+h2.volume {
+    border-top: 5px solid red;
+    border-bottom: 5px solid red;
+    color: darkred;
+}
+
+/* 修改章节标题样式 */
+h3.title {
+    color: blue;
+    border-bottom: 3px solid blue;
+}
+
+/* 修改章节序号样式 */
+h3.title span.chapter-number {
+    color: green;
+}
+```
+
+2. 使用 `--custom-css-file` 参数：
+```shell
+kaf-cli -filename 小说.txt --custom-css-file mystyle.css
+```
+
+#### 高级用法
+
+- 调整行间距：`.content { line-height: 2; }`
+- 修改字体大小：`h3.title { font-size: 1.5em; }`
+- 修改缩进：`.content { text-indent: 4em; }`
+- 修改边距：`body { margin: 2em; }`
 
 ### 自定义章节匹配规则
 >以下全部示例都可以自动识别，不需要自己设定标题格式了， 一般用上用上面的例子就行了
