@@ -28,16 +28,16 @@ jobs:
           unzip -d windows kindlegen_win32_v2_9.zip
 
       - name: Build
-        if: startsWith(github.ref_name, 'v')
         run: |
-          hash=`git rev-list --tags --max-count=1`
-          version=`git describe --tags $hash`
+          version=${GITHUB_REF_NAME}
           flag="-s -w -X main.secret=${{ secrets.API_SECRET }} -X main.measurement=${{ secrets.MEASUREMENT }} -X main.version=$version"
           mkdir -p /home/runner/go_bin
           export GOBIN=/home/runner/go_bin
           go get github.com/akavel/rsrc
           go install github.com/akavel/rsrc
           go mod tidy
+
+          # Build kaf-cli
           GOOS=linux   GOARCH=amd64   go build -ldflags "$flag" -o build/linux-amd64/kaf-cli       cmd/cli/main.go
           GOOS=linux   GOARCH=arm64   go build -ldflags "$flag" -o build/linux-arm64/kaf-cli       cmd/cli/main.go
           GOOS=linux   GOARCH=loong64 go build -ldflags "$flag" -o build/linux-loong64/kaf-cli     cmd/cli/main.go
@@ -48,18 +48,7 @@ jobs:
           GOOS=windows GOARCH=386     go build -ldflags "$flag" -o build/windows-386/kaf-cli.exe   cmd/cli/main.go
           GOOS=windows GOARCH=amd64   go build -ldflags "$flag" -o build/windows-amd64/kaf-cli.exe cmd/cli/main.go
 
-      - name: Build-MCP
-        if: startsWith(github.ref_name, 'mcp-')
-        run: |
-          hash=`git rev-list --tags --max-count=1`
-          version=`git describe --tags $hash`
-          version=${version#mcp-}
-          flag="-s -w -X main.secret=${{ secrets.API_SECRET }} -X main.measurement=${{ secrets.MEASUREMENT }} -X main.version=$version"
-          mkdir -p /home/runner/go_bin
-          export GOBIN=/home/runner/go_bin
-          go get github.com/akavel/rsrc
-          go install github.com/akavel/rsrc
-          go mod tidy
+          # Build kaf-mcp
           GOOS=linux   GOARCH=amd64   go build -ldflags "$flag" -o build/linux-amd64/kaf-mcp       cmd/mcp/main.go
           GOOS=linux   GOARCH=arm64   go build -ldflags "$flag" -o build/linux-arm64/kaf-mcp       cmd/mcp/main.go
           GOOS=linux   GOARCH=loong64 go build -ldflags "$flag" -o build/linux-loong64/kaf-mcp     cmd/mcp/main.go
@@ -70,11 +59,10 @@ jobs:
           GOOS=windows GOARCH=386     go build -ldflags "$flag" -o build/windows-386/kaf-mcp.exe   cmd/mcp/main.go
           GOOS=windows GOARCH=amd64   go build -ldflags "$flag" -o build/windows-amd64/kaf-mcp.exe cmd/mcp/main.go
 
-      - name: compression zip
-        if: startsWith(github.ref_name, 'v')
+      - name: Package
         run: |
-          hash=`git rev-list --tags --max-count=1`
-          version=`git describe --tags $hash`
+          version=${GITHUB_REF_NAME}
+          # kaf-cli
           zip -j kaf-cli_${version}_windows_amd64.zip build/windows-amd64/kaf-cli.exe windows/kindlegen.exe 注册右键菜单.ps1
           zip -j kaf-cli_${version}_windows_386.zip   build/windows-386/kaf-cli.exe windows/kindlegen.exe
           zip -j kaf-cli_${version}_darwin_amd64.zip  build/darwin-amd64/kaf-cli darwin/kindlegen
@@ -83,14 +71,8 @@ jobs:
           zip -j kaf-cli_${version}_linux_arm64.zip   build/linux-arm64/kaf-cli
           zip -j kaf-cli_${version}_linux_loong64.zip build/linux-loong64/kaf-cli
           zip -j kaf-cli_${version}_wasm_wasip1.zip   build/wasm-wasip1/kaf-cli.wasm README_wasi.md
-
-      - name: compression mcp zip
-        if: startsWith(github.ref_name, 'mcp-')
-        run: |
-          hash=`git rev-list --tags --max-count=1`
-          version=`git describe --tags $hash`
-          version=${version#mcp-}
-          zip -j kaf-mcp_${version}_windows_amd64.zip build/windows-amd64/kaf-mcp.exe windows/kindlegen.exe 
+          # kaf-mcp
+          zip -j kaf-mcp_${version}_windows_amd64.zip build/windows-amd64/kaf-mcp.exe windows/kindlegen.exe
           zip -j kaf-mcp_${version}_windows_386.zip   build/windows-386/kaf-mcp.exe windows/kindlegen.exe
           zip -j kaf-mcp_${version}_darwin_amd64.zip  build/darwin-amd64/kaf-mcp darwin/kindlegen
           zip -j kaf-mcp_${version}_darwin_arm64.zip  build/darwin-arm64/kaf-mcp darwin/kindlegen
