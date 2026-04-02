@@ -9,4 +9,6 @@ kaf-cli-*
 samples
 .aider*
 kaf-mcp
+cli
+mcp
 main

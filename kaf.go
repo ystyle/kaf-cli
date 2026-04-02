@@ -21,3 +21,16 @@ func Convert(book *Book) error {
 	conv := converter.Dispatcher{Book: book}
 	return conv.Convert()
 }
+
+func Preview(book *Book) ([]model.Section, error) {
+	if err := core.Check(book, "v1.0.0"); err != nil {
+		return nil, err
+	}
+	if err := core.Parse(book); err != nil {
+		return nil, err
+	}
+	if err := core.Parse(book); err != nil {
+		return nil, err
+	}
+	return book.SectionList, nil
+}
