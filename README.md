@@ -35,10 +35,14 @@
 - 包管理器安装:
   - Archlinux 可以在aur上安装 [`yay -S kaf-cli kaf-wifi`](https://aur.archlinux.org/packages/kaf-cli/) (包括龙芯loongarch64版本)
   - windows使用winget: `winget install kaf-cli`
-- Agent Skill安装:
-  ```shell
-  npx skills add ystyle/kaf-cli
-  ```
+
+### Agent Skill 安装
+
+kaf-cli 提供了 Agent Skill，安装后 AI 编程助手（Claude Code、Cursor、OpenCode 等）可以直接帮你转换小说。
+
+```shell
+npx skills add ystyle/kaf-cli
+```
 
 ### 使用方法
 1. 解压, 把小说直接拖到 `kaf-cli.exe` 文件上面
