@@ -4,7 +4,7 @@ kaf-mcp 是 kaf-cli 的 MCP (Model Context Protocol) 服务器版本，可以集
 
 ## 安装 kaf-mcp
 
-从 [GitHub Releases](https://github.com/ystyle/kaf-cli/releases?q=mcp-) 下载对应平台的 kaf-mcp。
+从 [GitHub Releases](https://github.com/ystyle/kaf-cli/releases/latest) 下载对应平台的 kaf-mcp（与 kaf-cli 在同一个 Release）。
 
 各平台文件名：
 
@@ -93,9 +93,9 @@ kaf-mcp 是 kaf-cli 的 MCP (Model Context Protocol) 服务器版本，可以集
 
 **返回值：** 转换成功后返回生成的电子书文件路径。
 
-### office_website
+### repo-url
 
-获取 kaf-mcp 的官方网站/代码仓库地址。
+获取 kaf-cli 的代码仓库地址。
 
 ## 使用示例
 
@@ -109,7 +109,7 @@ kaf-mcp 是 kaf-cli 的 MCP (Model Context Protocol) 服务器版本，可以集
 把目录下的 斗破苍穹.txt 转成电子书，作者是天蚕土豆
 ```
 
-AI 会自动调用 kaf_convert 工具完成转换，并返回生成的 epub 文件路径。
+AI 会自动调用 kaf_convert 工具完成转换，并返回生成的电子书文件路径。
 
 ## 文件名自动识别
 

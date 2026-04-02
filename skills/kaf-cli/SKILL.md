@@ -152,7 +152,7 @@ kaf-cli 还提供了 MCP (Model Context Protocol) 服务器版本，可集成到
 
 ### MCP 快速配置
 
-1. 从 [GitHub Releases](https://github.com/ystyle/kaf-cli/releases?q=mcp-) 下载 kaf-mcp
+1. 从 [GitHub Releases](https://github.com/ystyle/kaf-cli/releases/latest) 下载 kaf-mcp（与 kaf-cli 在同一个 Release）
 2. 在 AI 工具中配置 MCP 服务器，命令指向 kaf-mcp 路径
 3. 设置环境变量 `KAF_DIR` 为小说文件所在目录
 4. 在 AI 对话中直接请求转换小说即可

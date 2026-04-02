@@ -35,6 +35,10 @@
 - 包管理器安装:
   - Archlinux 可以在aur上安装 [`yay -S kaf-cli kaf-wifi`](https://aur.archlinux.org/packages/kaf-cli/) (包括龙芯loongarch64版本)
   - windows使用winget: `winget install kaf-cli`
+- Agent Skill安装:
+  ```shell
+  npx skills add ystyle/kaf-cli
+  ```
 
 ### 使用方法
 1. 解压, 把小说直接拖到 `kaf-cli.exe` 文件上面
@@ -194,8 +198,8 @@ d:/kaf-cli.exe -filename d:/ebbok.txt -match "Chapter .{1,8}"
 ```
 
 ### MCP 版本使用说明
->以cherry studio为例
-- 1. 点击下载[kaf-mcp](https://github.com/ystyle/kaf-cli/releases?q=mcp-), 并解压, 复制kaf-mcp的路径
+>以cherry studio为例，kaf-mcp 和 kaf-cli 在同一个 [Release](https://github.com/ystyle/kaf-cli/releases/latest) 下载
+- 1. 点击下载[kaf-mcp](https://github.com/ystyle/kaf-cli/releases/latest), 并解压, 复制kaf-mcp的路径
 - 2. 配置mcp
    - 命令这里填上面的kaf-mcp命令的路径
    - 在环境变量里添加`KAF_DIR=xxx`, xxx换成txt小说所在的目录，转换后的小说也会放这里

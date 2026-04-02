@@ -70,7 +70,7 @@ Linux 需要单独下载：
 
 ## MCP 版本安装
 
-从 [GitHub MCP Releases](https://github.com/ystyle/kaf-cli/releases?q=mcp-) 下载 kaf-mcp。文件名格式与 kaf-cli 类似，以 `kaf-mcp_` 开头。
+kaf-mcp 与 kaf-cli 在同一个 [Release](https://github.com/ystyle/kaf-cli/releases/latest) 中，下载以 `kaf-mcp_` 开头的压缩包即可。文件名格式与 kaf-cli 类似。
 
 ## 百度网盘下载
 
