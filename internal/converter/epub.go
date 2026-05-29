@@ -48,7 +48,6 @@ func NewEpubConverter() *EpubConverter {
                 text-align: %s;
                 font-size: 1.8em;
                 margin: 1em 0;
-                border-bottom: 2px solid #ccc;
             }
             h3.title span.chapter-number {
                 display: block;
